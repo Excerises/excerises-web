@@ -33,6 +33,9 @@ export function NavMain({
     }[];
   }[];
 }) {
+  const p = (path: string) =>
+    `/admin${path.startsWith("/") ? path : `/${path}`}`;
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -60,7 +63,7 @@ export function NavMain({
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton
                             render={
-                              <Link href={subItem.url}>
+                              <Link href={p(subItem.url)}>
                                 <span>{subItem.title}</span>
                               </Link>
                             }
@@ -77,7 +80,7 @@ export function NavMain({
               <SidebarMenuButton
                 tooltip={item.title}
                 render={
-                  <Link href={item.url}>
+                  <Link href={p(item.url)}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                   </Link>
