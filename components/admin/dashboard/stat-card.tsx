@@ -15,7 +15,7 @@ export default function AdminStatCard({
   return (
     <Card className="p-3">
       <div className="flex items-center gap-5">
-        <Icon className="size-8 text-primary/50" />
+        <Icon className="size-8 text-primary" />
         <div className="flex flex-col">
           <div className="text-sm font-medium text-muted-foreground">
             {label}
