@@ -1,5 +1,6 @@
 "use client";
 
+import { APP_NAME } from "@/constant/app";
 import Logo from "../logo";
 import ThemeToggler from "../theme-toggler";
 
@@ -10,7 +11,7 @@ export default function AuthHeader() {
         <div className="size-6 relative">
           <Logo />
         </div>
-        <div className="font-semibold text-xl text-primary">Exerises</div>
+        <div className="font-semibold text-xl text-primary">{APP_NAME}</div>
       </div>
       <ThemeToggler />
     </div>
