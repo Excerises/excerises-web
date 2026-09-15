@@ -1,6 +1,11 @@
 import Image from "next/image";
 import { ImgHTMLAttributes } from "react";
 
-export default function Logo(props: ImgHTMLAttributes<HTMLImageElement>) {
+export type LogoProps = Omit<
+  ImgHTMLAttributes<HTMLImageElement>,
+  "src" | "height" | "width" | "loading" | "ref" | "alt" | "srcSet"
+>;
+
+export default function Logo(props: LogoProps) {
   return <Image fill src="/logo.png" alt="Excerises" {...props} />;
 }
