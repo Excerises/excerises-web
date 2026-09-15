@@ -51,7 +51,13 @@ function formatDateLabel(createdAt: string): string {
   return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${formatTime(createdAt)}`;
 }
 
-function NotificationRow({ item, group }: { item: Notification; group: GroupKey }) {
+function NotificationRow({
+  item,
+  group,
+}: {
+  item: Notification;
+  group: GroupKey;
+}) {
   const unread = !item.readed_at;
 
   return (
@@ -76,13 +82,16 @@ function NotificationRow({ item, group }: { item: Notification; group: GroupKey 
             {item.title}
           </p>
           <span className="shrink-0 text-xs text-muted-foreground">
-            {group === "older" ? formatDateLabel(item.created_at) : formatTime(item.created_at)}
+            {group === "older"
+              ? formatDateLabel(item.created_at)
+              : formatTime(item.created_at)}
           </span>
         </div>
         {item.description && (
-          <p className="truncate text-sm text-muted-foreground">{item.description}</p>
+          <p className="truncate text-sm text-muted-foreground">
+            {item.description}
+          </p>
         )}
-        <p className="text-xs text-muted-foreground">{item.user?.name}</p>
       </div>
     </div>
   );
@@ -97,7 +106,8 @@ export default function NotificationsPage() {
 
     // Sort: data baru di atas
     const sorted = [...mockNotifications].sort(
-      (a, b) => parseDate(b.created_at).getTime() - parseDate(a.created_at).getTime(),
+      (a, b) =>
+        parseDate(b.created_at).getTime() - parseDate(a.created_at).getTime(),
     );
 
     const filtered = q
@@ -120,7 +130,8 @@ export default function NotificationsPage() {
     return result;
   }, [query, now]);
 
-  const total = groups.today.length + groups.yesterday.length + groups.older.length;
+  const total =
+    groups.today.length + groups.yesterday.length + groups.older.length;
   const order: GroupKey[] = ["today", "yesterday", "older"];
 
   return (
@@ -139,7 +150,9 @@ export default function NotificationsPage() {
             </div>
             <p className="text-sm font-medium">Tidak ada notifikasi</p>
             <p className="text-xs text-muted-foreground">
-              {query ? "Coba kata kunci lain." : "Semua notifikasi akan muncul di sini."}
+              {query
+                ? "Coba kata kunci lain."
+                : "Semua notifikasi akan muncul di sini."}
             </p>
           </CardContent>
         </Card>
@@ -149,7 +162,9 @@ export default function NotificationsPage() {
             groups[key].length > 0 ? (
               <section key={key} className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-semibold">{GROUP_META[key].title}</h2>
+                  <h2 className="text-sm font-semibold">
+                    {GROUP_META[key].title}
+                  </h2>
                   <Badge variant="secondary" className="text-xs">
                     {groups[key].length}
                   </Badge>
