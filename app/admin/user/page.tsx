@@ -1,6 +1,8 @@
 "use client";
 
 import AdminLayout from "@/components/admin/layout";
+import Paginator from "@/components/admin/paginator";
+import TopFilter from "@/components/admin/top-filter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -203,6 +205,7 @@ export default function UsersPage() {
 
   return (
     <AdminLayout breadcrumbs={[["Master Data"], ["User"]]}>
+      <TopFilter searchPlaceholder="Search users..." />
       <Card>
         <CardContent>
           <DataTable
@@ -213,6 +216,7 @@ export default function UsersPage() {
           />
         </CardContent>
       </Card>
+      <Paginator totalPage={1} />
     </AdminLayout>
   );
 }
