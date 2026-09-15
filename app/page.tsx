@@ -26,6 +26,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { APP_NAME } from "@/constant/app";
+import ThemeToggler from "@/components/theme-toggler";
 
 const features = [
   {
@@ -137,7 +138,6 @@ function StoreButtons({ dark = false }: { dark?: boolean }) {
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Navbar */}
       <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2.5">
@@ -177,10 +177,10 @@ export default function Home() {
               Download
             </Link>
           </nav>
+          <ThemeToggler />
         </div>
       </header>
 
-      {/* Banner / Hero */}
       <section className="relative overflow-hidden">
         <div
           aria-hidden
@@ -219,7 +219,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Stats */}
         <div className="relative mx-auto max-w-6xl px-4 pb-14 sm:px-6">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {stats.map((s) => (
@@ -234,7 +233,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features */}
       <section id="features" className="border-t bg-muted/40">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
           <div className="mx-auto max-w-2xl text-center">
@@ -269,7 +267,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How it works */}
       <section id="how-it-works" className="border-t">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
           <div className="mx-auto max-w-2xl text-center">
@@ -319,7 +316,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Latest News */}
       <section id="news" className="border-t bg-muted/40">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -383,7 +379,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Download */}
       <section id="download" className="border-t">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
           <div className="relative overflow-hidden rounded-3xl bg-zinc-950 px-6 py-12 text-center text-white sm:px-12 lg:py-16">
@@ -415,7 +410,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:px-6">
           <span className="flex items-center gap-2 font-semibold text-foreground">
