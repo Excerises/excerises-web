@@ -22,6 +22,7 @@ import {
   MoreHorizontalIcon,
   UploadIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 function difficultyVariant(difficulty: string) {
   switch (difficulty.toLowerCase()) {
@@ -43,10 +44,22 @@ function nowString() {
 }
 
 export default function ExercisesPage() {
+  const router = useRouter();
   const [exercises, setExercises] = useState<Exercise[]>(mockExercises);
   const [importNotice, setImportNotice] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const features = tableFeatures({});
+
+  const handleDelete = (exercise: Exercise) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${exercise.title}"? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    // TODO: replace with a real delete API call
+    setExercises((prev) => prev.filter((e) => e.id !== exercise.id));
+  };
 
   const columns: Array<ColumnDef<typeof features, Exercise>> = [
     {
@@ -106,7 +119,9 @@ export default function ExercisesPage() {
     {
       header: "Aksi",
       accessorKey: "options",
-      cell: () => {
+      cell: (info) => {
+        const exercise = info.row.original;
+
         return (
           <DropdownMenu>
             <DropdownMenuTrigger
@@ -117,9 +132,24 @@ export default function ExercisesPage() {
               }
             />
             <DropdownMenuContent className="w-auto">
-              <DropdownMenuItem>Detail</DropdownMenuItem>
-              <DropdownMenuItem>Edit</DropdownMenuItem>
-              <DropdownMenuItem>Delete</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => router.push(`/admin/exercises/${exercise.id}`)}
+              >
+                Detail
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  router.push(`/admin/exercises/${exercise.id}/edit`)
+                }
+              >
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => handleDelete(exercise)}
+              >
+                Delete
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );

@@ -17,10 +17,25 @@ import { mockUsers } from "@/mockups/users";
 import { User } from "@/types/model";
 import { ColumnDef, tableFeatures } from "@tanstack/react-table";
 import { MoreHorizontalIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function UsersPage() {
-  const users: User[] = mockUsers;
+  const router = useRouter();
+  const [users, setUsers] = useState<User[]>(mockUsers);
   const features = tableFeatures({});
+
+  const handleDelete = (user: User) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${user.name}"? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    // TODO: replace with a real delete API call
+    setUsers((prev) => prev.filter((u) => u.id !== user.id));
+  };
+
   const columns: Array<ColumnDef<typeof features, User>> = [
     {
       accessorKey: "name",
@@ -52,15 +67,17 @@ export default function UsersPage() {
     },
     {
       accessorKey: "last_login",
-      header: "Terakhir Login",
+      header: "Last Login",
       cell: (info) => (
         <span className="text-muted-foreground">{String(info.getValue())}</span>
       ),
     },
     {
-      header: "Aksi",
+      header: "Actions",
       accessorKey: "options",
-      cell: () => {
+      cell: (info) => {
+        const user = info.row.original;
+
         return (
           <DropdownMenu>
             <DropdownMenuTrigger
@@ -71,9 +88,29 @@ export default function UsersPage() {
               }
             />
             <DropdownMenuContent className="w-auto">
-              <DropdownMenuItem>Edit</DropdownMenuItem>
-              <DropdownMenuItem>Change Password</DropdownMenuItem>
-              <DropdownMenuItem>Delete</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => router.push(`/admin/users/${user.id}`)}
+              >
+                Detail
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => router.push(`/admin/users/${user.id}/edit`)}
+              >
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  router.push(`/admin/users/${user.id}/change-password`)
+                }
+              >
+                Change Password
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => handleDelete(user)}
+              >
+                Delete
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
