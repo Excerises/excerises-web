@@ -41,20 +41,20 @@ const data = {
       isActive: true,
       items: [
         {
-          title: "User",
-          url: "/user",
+          title: "Users",
+          url: "/users",
         },
         {
-          title: "Excercise",
-          url: "/excercise",
+          title: "Exercises",
+          url: "/exercises",
         },
       ],
     },
-    {
-      title: "Assistant",
-      url: "/assistant",
-      icon: Bot,
-    },
+    // {
+    //   title: "Assistant",
+    //   url: "/assistant",
+    //   icon: Bot,
+    // },
     {
       title: "Notification",
       url: "/notifications",
