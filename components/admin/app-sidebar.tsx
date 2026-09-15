@@ -3,14 +3,13 @@
 import * as React from "react";
 import {
   Bell,
-  Bot,
   DatabaseIcon,
   LayoutIcon,
   Settings2,
   User,
 } from "lucide-react";
 
-import { NavMain } from "@/components/admin/nav-main";
+import { NavMain, type NavMainItem } from "@/components/admin/nav-main";
 import { NavUser } from "@/components/admin/nav-user";
 import {
   Sidebar,
@@ -22,7 +21,10 @@ import {
 import Logo from "../logo";
 import { APP_NAME } from "@/constant/app";
 
-const data = {
+const data: {
+  user: { name: string; email: string; avatar: string };
+  navMain: NavMainItem[];
+} = {
   user: {
     name: "shadcn",
     email: "m@example.com",
@@ -38,7 +40,6 @@ const data = {
       title: "Master Data",
       url: "/",
       icon: DatabaseIcon,
-      isActive: true,
       items: [
         {
           title: "Users",
