@@ -4,9 +4,11 @@ import { Input } from "../ui/input";
 export interface TopFilterProps {
   searchPlaceholder?: string;
   actions?: React.ReactNode;
+  value?: string;
+  onSearchChange?: (value: string) => void;
 }
 
-export default function TopFilter({ searchPlaceholder, actions }: TopFilterProps) {
+export default function TopFilter({ searchPlaceholder, actions, value, onSearchChange }: TopFilterProps) {
   return (
     <div className="flex items-center justify-between gap-3">
       <div className="relative min-w-lg max-w-full">
@@ -16,6 +18,8 @@ export default function TopFilter({ searchPlaceholder, actions }: TopFilterProps
         <Input
           className="pl-10 w-full"
           placeholder={searchPlaceholder || "Search data..."}
+          value={value}
+          onChange={(e) => onSearchChange?.(e.target.value)}
         />
       </div>
       <div className="flex items-center gap-2 shrink-0">{actions}</div>
