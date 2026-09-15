@@ -1,13 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  Bell,
-  DatabaseIcon,
-  LayoutIcon,
-  Settings2,
-  User,
-} from "lucide-react";
+import { Bell, DatabaseIcon, LayoutIcon, Settings2, User } from "lucide-react";
 
 import { NavMain, type NavMainItem } from "@/components/admin/nav-main";
 import { NavUser } from "@/components/admin/nav-user";
@@ -48,6 +42,10 @@ const data: {
         {
           title: "Exercises",
           url: "/exercises",
+        },
+        {
+          title: "News",
+          url: "/news",
         },
       ],
     },

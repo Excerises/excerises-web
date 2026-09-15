@@ -57,11 +57,15 @@ export interface Exercise {
   updated_at: string;
 }
 
+export type NewsStatus = "published" | "draft";
+
 export interface News {
   id: string;
   title: string;
   description?: string;
   content: string;
+  thumbnail?: string;
+  status: NewsStatus;
   viewed_count: number;
   created_by_id?: number;
   creator: User;
