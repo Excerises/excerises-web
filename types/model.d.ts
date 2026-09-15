@@ -10,6 +10,7 @@ export interface User {
   profile: Relation<UserProfile[]>;
   login_logs: Relation<UserLoginLogs[]>;
   notifications: Relation<Notification[]>;
+  last_login?: string;
   created_at: string;
   updated_at: string;
 }
