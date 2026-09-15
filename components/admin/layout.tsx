@@ -37,18 +37,18 @@ export default function AdminLayout({
                 </BreadcrumbLink>
               </BreadcrumbItem>
               {breadcrumbs?.map(([label, url], i) => (
-                <>
-                  <BreadcrumbSeparator key={i} />
+                <div key={label} className="flex gap-x-2 items-center">
+                  <BreadcrumbSeparator />
                   {url ? (
-                    <BreadcrumbItem key={i}>
+                    <BreadcrumbItem>
                       <BreadcrumbLink href={url}>{label}</BreadcrumbLink>
                     </BreadcrumbItem>
                   ) : (
-                    <BreadcrumbItem key={i}>
+                    <BreadcrumbItem>
                       <BreadcrumbPage>{label}</BreadcrumbPage>
                     </BreadcrumbItem>
                   )}
-                </>
+                </div>
               ))}
             </BreadcrumbList>
           </Breadcrumb>
