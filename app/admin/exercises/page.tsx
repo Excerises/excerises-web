@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import DataTable from "@/components/ui/table/data-table";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { mockExercises } from "@/mockups/exercises";
 import { Exercise } from "@/types/model";
 import { ColumnDef, tableFeatures } from "@tanstack/react-table";
@@ -46,19 +47,23 @@ function nowString() {
 export default function ExercisesPage() {
   const router = useRouter();
   const [exercises, setExercises] = useState<Exercise[]>(mockExercises);
+  const [exerciseToDelete, setExerciseToDelete] = useState<Exercise | null>(
+    null
+  );
   const [importNotice, setImportNotice] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const features = tableFeatures({});
 
   const handleDelete = (exercise: Exercise) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${exercise.title}"? This action cannot be undone.`
-    );
+    setExerciseToDelete(exercise);
+  };
 
-    if (!confirmed) return;
+  const handleConfirmDelete = () => {
+    if (!exerciseToDelete) return;
 
     // TODO: replace with a real delete API call
-    setExercises((prev) => prev.filter((e) => e.id !== exercise.id));
+    setExercises((prev) => prev.filter((e) => e.id !== exerciseToDelete.id));
+    setExerciseToDelete(null);
   };
 
   const columns: Array<ColumnDef<typeof features, Exercise>> = [
@@ -291,6 +296,18 @@ export default function ExercisesPage() {
         </CardContent>
       </Card>
       <Paginator totalPage={1} />
+      <ConfirmDialog
+        open={exerciseToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setExerciseToDelete(null);
+        }}
+        title="Delete Exercise?"
+        description={`Are you sure you want to delete "${exerciseToDelete?.title ?? ""}"? This action cannot be undone.`}
+        cancelText="Cancel"
+        confirmText="Delete"
+        confirmVariant="destructive"
+        onConfirm={handleConfirmDelete}
+      />
     </AdminLayout>
   );
 }

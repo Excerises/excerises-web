@@ -5,6 +5,7 @@ import Paginator from "@/components/admin/paginator";
 import TopFilter from "@/components/admin/top-filter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -23,17 +24,19 @@ import { useState } from "react";
 export default function UsersPage() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>(mockUsers);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const features = tableFeatures({});
 
   const handleDelete = (user: User) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${user.name}"? This action cannot be undone.`
-    );
+    setUserToDelete(user);
+  };
 
-    if (!confirmed) return;
+  const handleConfirmDelete = () => {
+    if (!userToDelete) return;
 
     // TODO: replace with a real delete API call
-    setUsers((prev) => prev.filter((u) => u.id !== user.id));
+    setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
+    setUserToDelete(null);
   };
 
   const columns: Array<ColumnDef<typeof features, User>> = [
@@ -132,6 +135,18 @@ export default function UsersPage() {
         </CardContent>
       </Card>
       <Paginator totalPage={1} />
+      <ConfirmDialog
+        open={userToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setUserToDelete(null);
+        }}
+        title="Delete User?"
+        description={`Are you sure you want to delete "${userToDelete?.name ?? ""}"? This action cannot be undone.`}
+        cancelText="Cancel"
+        confirmText="Delete"
+        confirmVariant="destructive"
+        onConfirm={handleConfirmDelete}
+      />
     </AdminLayout>
   );
 }
