@@ -28,8 +28,7 @@ export default function RegistrationChart() {
               {
                 name: "Sign-ups",
                 data: [
-                  210, 380, 340, 520, 480, 610, 700, 880, 820, 1040, 1180,
-                  1520,
+                  210, 380, 340, 520, 480, 610, 700, 880, 820, 1040, 1180, 1520,
                 ],
               },
             ]}
@@ -37,6 +36,7 @@ export default function RegistrationChart() {
               theme: {
                 mode: theme === "dark" ? "dark" : "light",
               },
+              colors: ["#D7263D"],
               chart: {
                 background: "transparent",
                 height: 350,
