@@ -86,7 +86,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <div className="size-6 relative">
             <Logo />
           </div>
-          <div className="text-xl font-semibold text-primary truncate min-w-0">
+          <div className="text-xl font-semibold text-foreground truncate min-w-0">
             {APP_NAME}
           </div>
         </div>
