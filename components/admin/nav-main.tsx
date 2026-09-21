@@ -76,7 +76,7 @@ function NavCollapsibleItem({
               <SidebarMenuButton
                 tooltip={item.title}
                 isActive={buttonActive}
-                className={buttonActive ? "bg-primary! text-white!" : ""}
+                className={buttonActive ? "" : ""}
               >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
@@ -90,9 +90,7 @@ function NavCollapsibleItem({
                 <SidebarMenuSubItem key={subItem.title}>
                   <SidebarMenuSubButton
                     isActive={subActive(subItem)}
-                    className={
-                      subActive(subItem) ? "bg-primary! text-white!" : ""
-                    }
+                    className={subActive(subItem) ? "" : ""}
                     render={
                       <Link href={p(subItem.url)}>
                         <span>{subItem.title}</span>
@@ -128,11 +126,7 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
               <SidebarMenuButton
                 tooltip={item.title}
                 isActive={item.isActive ?? isPathActive(pathname, item.url)}
-                className={
-                  isPathActive(pathname, item.url)
-                    ? "bg-primary! text-white!"
-                    : ""
-                }
+                className={isPathActive(pathname, item.url) ? "" : ""}
                 render={
                   <Link href={p(item.url)}>
                     {item.icon && <item.icon />}

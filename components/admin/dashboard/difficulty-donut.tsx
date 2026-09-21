@@ -33,7 +33,6 @@ export default function DifficultyDonut({
           type="donut"
           series={[beginner, intermediate, advanced]}
           options={{
-            colors: ["#D7263D", "#1B998B", "#2E294E"],
             theme: { mode: theme === "dark" ? "dark" : "light" },
             chart: { background: "transparent", type: "donut" },
             labels: ["Beginner", "Intermediate", "Advanced"],

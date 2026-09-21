@@ -36,7 +36,6 @@ export default function RegistrationChart() {
               theme: {
                 mode: theme === "dark" ? "dark" : "light",
               },
-              colors: ["#D7263D"],
               chart: {
                 background: "transparent",
                 height: 350,
