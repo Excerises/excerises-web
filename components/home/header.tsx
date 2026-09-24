@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { APP_NAME } from "@/constant/app";
 import ThemeToggler from "@/components/theme-toggler";
+import Logo from "../logo";
 
 export default function Header() {
   return (
@@ -9,12 +9,7 @@ export default function Header() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5">
           <span className="relative block size-9 overflow-hidden rounded-xl">
-            <Image
-              src="/logo.png"
-              alt={APP_NAME}
-              fill
-              className="object-cover"
-            />
+            <Logo />
           </span>
           <span className="text-lg font-bold tracking-tight">{APP_NAME}</span>
         </Link>
@@ -31,7 +26,10 @@ export default function Header() {
           >
             How It Works
           </Link>
-          <Link href="#news" className="transition-colors hover:text-foreground">
+          <Link
+            href="#news"
+            className="transition-colors hover:text-foreground"
+          >
             News
           </Link>
           <Link
