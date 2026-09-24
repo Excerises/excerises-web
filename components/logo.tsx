@@ -7,5 +7,5 @@ export type LogoProps = Omit<
 >;
 
 export default function Logo(props: LogoProps) {
-  return <Image fill src="/logo.png" alt="Excerises" {...props} />;
+  return <Image fill src="/favicon.png" alt="Excerises" {...props} />;
 }
