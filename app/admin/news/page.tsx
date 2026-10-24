@@ -15,11 +15,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import DataTable from "@/components/ui/table/data-table";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { mockNews } from "@/mockups/news";
 import { News } from "@/types/model";
-import { ColumnDef, tableFeatures } from "@tanstack/react-table";
+import {
+  ColumnDef,
+  createPaginatedRowModel,
+  rowPaginationFeature,
+  tableFeatures,
+} from "@tanstack/react-table";
 import { EyeIcon, MoreHorizontalIcon, PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useGetNews } from "@/hooks/api/news/use-news-query";
+import { Spinner } from "@/components/ui/spinner";
 
 function statusVariant(status: string) {
   switch (status.toLowerCase()) {
@@ -33,134 +39,143 @@ function statusVariant(status: string) {
 }
 
 export default function NewsPage() {
+  const {
+    query: newsQuery,
+    search,
+    setSearch,
+    debouncedSearch,
+    pagination,
+  } = useGetNews();
+
   const router = useRouter();
-  const [query, setQuery] = useState("");
-  const [items, setItems] = useState<News[]>(mockNews);
   const [newsToDelete, setNewsToDelete] = useState<News | null>(null);
-  const features = tableFeatures({});
+  const features = tableFeatures({
+    rowPaginationFeature: rowPaginationFeature,
+    paginatedRowModel: createPaginatedRowModel(),
+  });
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return items;
-    return items.filter((n) =>
-      [n.title, n.description ?? "", n.content, n.creator?.name ?? ""]
-        .join(" ")
+    return (newsQuery.data?.data || []).filter((n) =>
+      [n.title, n.description || ""]
+        .join("")
         .toLowerCase()
-        .includes(q),
+        .includes(debouncedSearch.toLowerCase()),
     );
-  }, [items, query]);
+  }, [newsQuery.data?.data, debouncedSearch]);
 
   const handleConfirmDelete = () => {
     if (!newsToDelete) return;
 
     // TODO: replace with a real delete API call
-    setItems((prev) => prev.filter((n) => n.id !== newsToDelete.id));
     setNewsToDelete(null);
   };
 
-  const columns: Array<ColumnDef<typeof features, News>> = [
-    {
-      accessorKey: "title",
-      header: "Berita",
-      cell: (info) => {
-        const news = info.row.original;
-        return (
-          <div className="flex items-center gap-3">
-            {news.thumbnail ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={news.thumbnail}
-                alt={news.title}
-                className="size-10 shrink-0 rounded-lg object-cover ring-1 ring-foreground/10"
-              />
-            ) : (
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-sm font-semibold text-muted-foreground">
-                {news.title.charAt(0).toUpperCase()}
-              </span>
-            )}
-            <div className="flex min-w-0 flex-col">
-              <strong className="truncate">{news.title}</strong>
-              {news.description && (
-                <span className="truncate text-xs text-muted-foreground">
-                  {news.description}
+  const columns = useMemo<Array<ColumnDef<typeof features, News>>>(
+    () => [
+      {
+        accessorKey: "title",
+        header: "Berita",
+        cell: (info) => {
+          const news = info.row.original;
+          return (
+            <div className="flex items-center gap-3">
+              {news.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={news.image}
+                  alt={news.title}
+                  className="size-10 shrink-0 rounded-lg object-cover ring-1 ring-foreground/10"
+                />
+              ) : (
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-sm font-semibold text-muted-foreground">
+                  {news.title.charAt(0).toUpperCase()}
                 </span>
               )}
+              <div className="flex min-w-0 flex-col">
+                <strong className="truncate">{news.title}</strong>
+                {news.description && (
+                  <span className="truncate text-xs text-muted-foreground">
+                    {news.description}
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-        );
+          );
+        },
       },
-    },
-    {
-      accessorKey: "status",
-      header: "Status",
-      cell: (info) => {
-        const status = info.row.original.status;
-        return (
-          <Badge variant={statusVariant(status)} className="text-xs">
-            {status.toUpperCase()}
-          </Badge>
-        );
+      {
+        accessorKey: "status",
+        header: "Status",
+        cell: (info) => {
+          const status = info.row.original.status || "published";
+          return (
+            <Badge variant={statusVariant(status)} className="text-xs">
+              {status.toUpperCase()}
+            </Badge>
+          );
+        },
       },
-    },
-    {
-      accessorKey: "viewed_count",
-      header: "Views",
-      cell: (info) => (
-        <span className="inline-flex items-center gap-1.5 text-muted-foreground tabular-nums">
-          <EyeIcon className="size-3.5" />
-          {Number(info.getValue() ?? 0).toLocaleString("id-ID")}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "created_at",
-      header: "Created At",
-      cell: (info) => (
-        <span className="text-muted-foreground tabular-nums">
-          {String(info.getValue())}
-        </span>
-      ),
-    },
-    {
-      header: "Aksi",
-      accessorKey: "options",
-      cell: (info) => {
-        const news = info.row.original;
+      {
+        accessorKey: "viewed_count",
+        header: "Views",
+        cell: (info) => (
+          <span className="inline-flex items-center gap-1.5 text-muted-foreground tabular-nums">
+            <EyeIcon className="size-3.5" />
+            {Number(info.getValue() ?? 0).toLocaleString("id-ID")}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "created_at",
+        header: "Created At",
+        cell: (info) => (
+          <span className="text-muted-foreground tabular-nums">
+            {String(info.getValue())}
+          </span>
+        ),
+      },
+      {
+        header: "Aksi",
+        accessorKey: "options",
+        cell: (info) => {
+          const news = info.row.original;
 
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button type="button" size="icon-xs" variant="ghost">
-                  <MoreHorizontalIcon className="size-4" />
-                </Button>
-              }
-            />
-            <DropdownMenuContent className="w-auto">
-              <DropdownMenuItem
-                onClick={() => router.push(`/admin/news/${news.id}/edit`)}
-              >
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setNewsToDelete(news)}
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button type="button" size="icon-xs" variant="ghost">
+                    <MoreHorizontalIcon className="size-4" />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent className="w-auto">
+                <DropdownMenuItem
+                  onClick={() => router.push(`/admin/news/${news.id}/edit`)}
+                >
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => setNewsToDelete(news)}
+                >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
       },
-    },
-  ];
+    ],
+    [],
+  );
 
   return (
     <AdminLayout breadcrumbs={[["Master Data"], ["News"]]}>
       <TopFilter
         searchPlaceholder="Search news..."
-        value={query}
-        onSearchChange={setQuery}
+        searchValue={search}
+        onSearchChange={setSearch}
         actions={
           <Button
             type="button"
@@ -174,15 +189,33 @@ export default function NewsPage() {
       />
       <Card>
         <CardContent>
-          <DataTable
-            columns={columns}
-            data={filtered}
-            features={features}
-            tableKey="news-table"
-          />
+          {newsQuery.isLoading ? (
+            <div className="flex items-center justify-center">
+              <Spinner />
+            </div>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={filtered}
+              features={features}
+              tableKey="news-table"
+              state={{
+                pagination: {
+                  pageIndex: pagination.page - 1,
+                  pageSize: pagination.limit,
+                },
+              }}
+            />
+          )}
         </CardContent>
       </Card>
-      <Paginator totalPage={1} />
+      <Paginator
+        totalPage={Math.ceil(filtered.length / pagination.limit)}
+        currentPage={pagination.page}
+        onCurrentPageChange={pagination.setPage}
+        perPage={pagination.limit}
+        onPerPageChange={pagination.setLimit}
+      />
       <ConfirmDialog
         open={newsToDelete !== null}
         onOpenChange={(open) => {

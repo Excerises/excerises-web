@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import DataTable from "@/components/ui/table/data-table";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { mockExercises } from "@/mockups/exercises";
 import { Exercise } from "@/types/model";
 import {
   ColumnDef,
@@ -27,6 +26,7 @@ import { DownloadIcon, MoreHorizontalIcon, UploadIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useGetExercises } from "@/hooks/api/exercise/use-exercise-query";
 import { capitalize } from "@/lib/format";
+import { Spinner } from "@/components/ui/spinner";
 
 function difficultyVariant(difficulty: string) {
   switch (difficulty.toLowerCase()) {
@@ -252,18 +252,24 @@ export default function ExercisesPage() {
       )}
       <Card>
         <CardContent>
-          <DataTable
-            columns={columns}
-            data={filteredExercises}
-            features={features}
-            tableKey="exercises-table"
-            state={{
-              pagination: {
-                pageIndex: pagination.page - 1,
-                pageSize: pagination.limit,
-              },
-            }}
-          />
+          {exercisesQuery.isLoading ? (
+            <div className="flex items-center justify-center">
+              <Spinner />
+            </div>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={filteredExercises}
+              features={features}
+              tableKey="exercises-table"
+              state={{
+                pagination: {
+                  pageIndex: pagination.page - 1,
+                  pageSize: pagination.limit,
+                },
+              }}
+            />
+          )}
         </CardContent>
       </Card>
       <Paginator

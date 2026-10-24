@@ -25,6 +25,7 @@ import { MoreHorizontalIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useGetUsers } from "@/hooks/api/user/use-user-query";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function UsersPage() {
   const {
@@ -157,18 +158,24 @@ export default function UsersPage() {
       />
       <Card>
         <CardContent>
-          <DataTable
-            columns={columns}
-            data={filteredUsers}
-            features={features}
-            tableKey="users-table"
-            state={{
-              pagination: {
-                pageIndex: pagination.page - 1,
-                pageSize: pagination.limit,
-              },
-            }}
-          />
+          {usersQuery.isLoading ? (
+            <div className="flex items-center justify-center">
+              <Spinner />
+            </div>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={filteredUsers}
+              features={features}
+              tableKey="users-table"
+              state={{
+                pagination: {
+                  pageIndex: pagination.page - 1,
+                  pageSize: pagination.limit,
+                },
+              }}
+            />
+          )}
         </CardContent>
       </Card>
       <Paginator

@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
 import {
-  ArrowRight,
   Brain,
   CalendarCheck,
   Dumbbell,
@@ -10,7 +8,6 @@ import {
   LineChart,
   Target,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { APP_NAME } from "@/constant/app";
 import Header from "@/components/home/header";
@@ -20,7 +17,7 @@ import StepCard from "@/components/home/step-card";
 import NewsCard from "@/components/home/news-card";
 import StartTrainingToday from "@/components/home/start-training-today";
 import Footer from "@/components/home/footer";
-import { useGetNews } from "@/hooks/api/news/use-get-news";
+import { useGetNews } from "@/hooks/api/news/use-news-query";
 
 const features = [
   {

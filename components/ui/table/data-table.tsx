@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -14,6 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from "../table";
+import { NoRecord } from "@/components/admin/no-record";
+import { ReactNode } from "react";
 
 export type DataTableProps<
   TFeatures extends TableFeatures,
@@ -25,9 +28,27 @@ export type DataTableProps<
 export default function DataTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
->(props: DataTableProps<TFeatures, TData>) {
+>({
+  emptyMessage,
+  emptyAction,
+  ...props
+}: DataTableProps<TFeatures, TData> & {
+  emptyMessage?: string;
+  emptyAction?: ReactNode;
+}) {
   const { tableKey } = props;
-  const table = useTable<TFeatures, TData>({ ...props, key: tableKey });
+  const table = useTable<TFeatures, TData>({
+    ...(props as any),
+    key: tableKey,
+  });
+
+  if (props.data.length == 0) {
+    return (
+      <NoRecord message={emptyMessage || "No records found."}>
+        {emptyAction}
+      </NoRecord>
+    );
+  }
 
   return (
     <>
