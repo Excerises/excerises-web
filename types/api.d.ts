@@ -15,3 +15,10 @@ export interface ProfileProgressResponse {
   minutes: number;
   weeklyDurations: number[];
 }
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  next_cursor?: string;
+  has_more?: boolean;
+  limit: number;
+}

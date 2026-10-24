@@ -44,7 +44,7 @@ export interface UserLoginLogs {
 
 export interface Exercise {
   id: string;
-  title: string;
+  name: string;
   description?: string;
   body_part: string;
   equipment: string;

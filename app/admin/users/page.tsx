@@ -152,7 +152,7 @@ export default function UsersPage() {
     <AdminLayout breadcrumbs={[["Master Data"], ["User"]]}>
       <TopFilter
         searchPlaceholder="Search users..."
-        value={search}
+        searchValue={search}
         onSearchChange={setSearch}
       />
       <Card>
