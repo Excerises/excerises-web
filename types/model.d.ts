@@ -64,7 +64,7 @@ export interface News {
   title: string;
   description?: string;
   content: string;
-  thumbnail?: string;
+  image?: string;
   status: NewsStatus;
   viewed_count: number;
   created_by_id?: number;

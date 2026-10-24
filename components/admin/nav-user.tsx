@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useState } from "react";
-import { useLogout } from "@/hooks/auth/use-logout";
+import { useLogout } from "@/hooks/api/auth/use-logout";
 
 export function NavUser({
   user,

@@ -4,7 +4,7 @@ import AuthLayout from "@/components/auth/layout";
 import { Button } from "@/components/ui/button";
 import FormGroup from "@/components/ui/form/form-group";
 import { Input } from "@/components/ui/input";
-import { useLogin } from "@/hooks/auth/use-login";
+import { useLogin } from "@/hooks/api/auth/use-login";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";

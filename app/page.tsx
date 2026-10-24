@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   ArrowRight,
@@ -18,6 +20,7 @@ import StepCard from "@/components/home/step-card";
 import NewsCard from "@/components/home/news-card";
 import StartTrainingToday from "@/components/home/start-training-today";
 import Footer from "@/components/home/footer";
+import { useGetNews } from "@/hooks/api/news/use-get-news";
 
 const features = [
   {
@@ -102,6 +105,10 @@ const news = [
 ];
 
 export default function Home() {
+  const {
+    query: { data: newsData },
+  } = useGetNews();
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
@@ -147,33 +154,37 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="news" className="border-t bg-muted/40">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div className="max-w-xl">
-              <Badge variant="secondary" className="rounded-full">
-                Latest News
-              </Badge>
-              <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Stay Updated on Your Fitness Journey
-              </h2>
-              <p className="mt-3 text-muted-foreground">
-                Training insights, ML explainers, and product updates from the{" "}
-                {APP_NAME} team.
-              </p>
+      {newsData && newsData.data.length > 0 && (
+        <section id="news" className="border-t bg-muted/40">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="max-w-xl">
+                <Badge variant="secondary" className="rounded-full">
+                  Latest News
+                </Badge>
+                <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
+                  Stay Updated on Your Fitness Journey
+                </h2>
+                <p className="mt-3 text-muted-foreground">
+                  Training insights, ML explainers, and product updates from the{" "}
+                  {APP_NAME} team.
+                </p>
+              </div>
+              {/*
+              <Button render={<Link href="/news" />} className="w-fit shrink-0">
+                View All News <ArrowRight className="size-4" />
+              </Button>
+              */}
             </div>
-            <Button render={<Link href="/news" />} className="w-fit shrink-0">
-              View All News <ArrowRight className="size-4" />
-            </Button>
-          </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {news.map((item) => (
-              <NewsCard key={item.title} {...item} />
-            ))}
+            <div className="mt-8 grid gap-4 md:grid-cols-2">
+              {newsData.data.slice(0, 4).map((news) => (
+                <NewsCard key={news.id} news={news} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <StartTrainingToday />
       <Footer />
