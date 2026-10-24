@@ -26,12 +26,14 @@ export function useAppEntry() {
       router.replace("/login");
     }
 
+    await new Promise((res) => setTimeout(res, 400));
+
     setIsReady(true);
   }
 
   useEffect(() => {
     resolve();
-  }, [isLoaded, user]);
+  }, [isLoaded, user, pathname]);
 
   return { isReady };
 }

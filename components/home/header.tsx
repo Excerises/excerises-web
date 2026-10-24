@@ -1,9 +1,16 @@
+"use client";
+
 import Link from "next/link";
 import { APP_NAME } from "@/constant/app";
 import ThemeToggler from "@/components/theme-toggler";
 import Logo from "../logo";
+import { useAuth } from "@/context/auth-context";
+import { NavUser } from "../admin/nav-user";
+import { AuthDropdown } from "../auth/auth-dropdown";
 
 export default function Header() {
+  const { user } = useAuth();
+
   return (
     <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -39,7 +46,10 @@ export default function Header() {
             Download
           </Link>
         </nav>
-        <ThemeToggler />
+        <div className="flex items-center justify-end gap-4">
+          <ThemeToggler />
+          {user && <AuthDropdown />}
+        </div>
       </div>
     </header>
   );
