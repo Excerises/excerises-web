@@ -12,7 +12,6 @@ import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "../ui/pagination";
@@ -50,14 +49,26 @@ export default function Paginator({
     setCurrentPage(baseCurrentPage);
   }, [baseCurrentPage]);
 
+  function handlePerPageChange(page?: number) {
+    const v = page || 10;
+    onPerPageChange?.(v);
+    setPerPage(v);
+  }
+
+  function handleCurrentPageChange(page?: number) {
+    const v = page || 1;
+    onCurrentPageChange?.(v);
+    setCurrentPage(v);
+  }
+
   function onPrevPage() {
     if (!canPrevPage) return;
-    setCurrentPage(currentPage - 1);
+    handleCurrentPageChange(currentPage - 1);
   }
 
   function onNextPage() {
     if (!canNextPage) return;
-    setCurrentPage(currentPage + 1);
+    handleCurrentPageChange(currentPage + 1);
   }
 
   return (
@@ -66,7 +77,7 @@ export default function Paginator({
         <span className="text-sm whitespace-nowrap">Result per page</span>
         <Select
           value={perPage}
-          onValueChange={(page) => onPerPageChange?.(page || 10)}
+          onValueChange={(page) => handlePerPageChange(page || 10)}
         >
           <SelectTrigger>
             <SelectValue placeholder="per page" />
