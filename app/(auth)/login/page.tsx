@@ -2,61 +2,65 @@
 
 import AuthLayout from "@/components/auth/layout";
 import { Button } from "@/components/ui/button";
-import FormGroup from "@/components/ui/form/form-group";
+import { FormControl } from "@/components/ui/form/form-control";
 import { Input } from "@/components/ui/input";
-import { useLogin } from "@/hooks/api/auth/use-login";
+import { useLogin, useLoginForm } from "@/hooks/api/auth/use-login";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function LoginPage() {
-  const { email, setEmail, password, setPassword, handleLogin } = useLogin();
+  const { mutation } = useLogin();
+  const { control, handleSubmit } = useLoginForm();
   const [showPassword, setShowPassword] = useState(false);
+
+  const onLogin = handleSubmit(async (v) => {
+    await mutation.mutateAsync(v);
+  });
 
   return (
     <AuthLayout
       title="Sign In"
       description="Welcome back! Enter your credentials to sign in."
     >
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleLogin();
-        }}
-      >
+      <form onSubmit={onLogin}>
         <div className="space-y-4 mb-10">
-          <FormGroup label="Email" required>
-            <Input
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.currentTarget.value)}
-              type="email"
-              required
-            />
-          </FormGroup>
-          <FormGroup label="Password" required>
-            <div className="relative">
-              <Input
-                placeholder="Password"
-                className="pr-10"
-                value={password}
-                onChange={(e) => setPassword(e.currentTarget.value)}
-                type={showPassword ? "text" : "password"}
-                required
-              />
-              <button
-                type="button"
-                className="absolute top-0 bottom-0 right-0 w-10 flex items-center justify-center outline-none"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeIcon className="size-4" />
-                ) : (
-                  <EyeOffIcon className="size-4" />
-                )}
-              </button>
-            </div>
-          </FormGroup>
+          <FormControl
+            control={control}
+            name="email"
+            label="Email"
+            required
+            render={({ field }) => (
+              <Input placeholder="Email" {...field} type="email" />
+            )}
+          />
+          <FormControl
+            control={control}
+            name="password"
+            label="Password"
+            required
+            render={({ field }) => (
+              <div className="relative">
+                <Input
+                  placeholder="Password"
+                  className="pr-10"
+                  {...field}
+                  type={showPassword ? "text" : "password"}
+                />
+                <button
+                  type="button"
+                  className="absolute top-0 bottom-0 right-0 w-10 flex items-center justify-center outline-none"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeIcon className="size-4" />
+                  ) : (
+                    <EyeOffIcon className="size-4" />
+                  )}
+                </button>
+              </div>
+            )}
+          />
           <div className="flex justify-end">
             <Link href="/forgot-password" className="text-primary text-sm">
               Forgot password?

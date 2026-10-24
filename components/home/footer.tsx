@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { APP_NAME } from "@/constant/app";
+import Logo from "../logo";
 
 export default function Footer() {
   return (
@@ -8,12 +8,7 @@ export default function Footer() {
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:px-6">
         <span className="flex items-center gap-2 font-semibold text-foreground">
           <span className="relative block size-7 overflow-hidden rounded-lg">
-            <Image
-              src="/logo.png"
-              alt={APP_NAME}
-              fill
-              className="object-cover"
-            />
+            <Logo />
           </span>
           {APP_NAME}
         </span>

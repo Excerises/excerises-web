@@ -8,3 +8,10 @@ export interface AuthResponse {
   access_token: string;
   refresh_token: string;
 }
+
+export interface ProfileProgressResponse {
+  streaks: number;
+  workouts: number;
+  minutes: number;
+  weeklyDurations: number[];
+}

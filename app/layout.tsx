@@ -4,7 +4,6 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toast";
 import { AppProvider } from "@/context/app-context";
-import { ReactNode } from "react";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -39,15 +38,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background">
-        <AppProvider>
-          <RootContent>{children}</RootContent>
-        </AppProvider>
+        <AppProvider>{children}</AppProvider>
         <Toaster />
       </body>
     </html>
   );
-}
-
-export function RootContent({ children }: { children?: ReactNode }) {
-  return children;
 }

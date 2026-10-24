@@ -1,28 +1,46 @@
-import { toast } from "@/components/ui/toast";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { api } from "@/network/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import z from "zod";
+import { ApiResponse, AuthResponse } from "@/types/api";
+import { useSetAuthToken } from "./use-set-auth-token";
+
+const schema = z.object({
+  email: z.email().min(1, "Email is required"),
+  password: z.string().min(1, "Password is required"),
+});
+
+export type LoginRequest = z.infer<typeof schema>;
 
 export function useLogin() {
-  const router = useRouter();
+  const { setToken } = useSetAuthToken();
+  const queryClient = useQueryClient();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const mutation = useMutation({
+    mutationKey: ["login"],
+    mutationFn: async (req: LoginRequest) => {
+      const res = await api.client.post<ApiResponse<AuthResponse>>(
+        "/auth/login",
+        req,
+      );
 
-  function handleLogin() {
-    toast.add({
-      title: "Success",
-      description: `Hello ${email}`,
-      type: "success",
-    });
+      await setToken(res.data.data);
+      queryClient.invalidateQueries({ queryKey: ["get-profile"] });
 
-    router.push("/admin");
-  }
+      return res.data;
+    },
+  });
 
-  return {
-    email,
-    setEmail,
-    password,
-    setPassword,
-    handleLogin,
-  };
+  return { mutation };
+}
+
+export function useLoginForm() {
+  return useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 }
