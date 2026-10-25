@@ -3,7 +3,7 @@ import { Exercise } from "@/types/model";
 export const mockExercises: Exercise[] = [
   {
     id: "1",
-    title: "Push Up",
+    name: "Push Up",
     description: "Latihan dada dan trisep dengan berat badan sendiri.",
     body_part: "Chest",
     equipment: "Body Weight",
@@ -21,7 +21,7 @@ export const mockExercises: Exercise[] = [
   },
   {
     id: "2",
-    title: "Barbell Squat",
+    name: "Barbell Squat",
     description: "Latihan kaki utama untuk kekuatan paha dan glutes.",
     body_part: "Legs",
     equipment: "Barbell",
@@ -39,7 +39,7 @@ export const mockExercises: Exercise[] = [
   },
   {
     id: "3",
-    title: "Deadlift",
+    name: "Deadlift",
     description: "Gerakan compound untuk punggung bawah dan posterior chain.",
     body_part: "Back",
     equipment: "Barbell",
@@ -57,7 +57,7 @@ export const mockExercises: Exercise[] = [
   },
   {
     id: "4",
-    title: "Dumbbell Shoulder Press",
+    name: "Dumbbell Shoulder Press",
     description: "Latihan bahu dengan dumbbell dari posisi duduk.",
     body_part: "Shoulders",
     equipment: "Dumbbell",
@@ -75,7 +75,7 @@ export const mockExercises: Exercise[] = [
   },
   {
     id: "5",
-    title: "Plank",
+    name: "Plank",
     description: "Latihan isometrik untuk stabilitas otot inti.",
     body_part: "Core",
     equipment: "Body Weight",
@@ -93,7 +93,7 @@ export const mockExercises: Exercise[] = [
   },
   {
     id: "6",
-    title: "Pull Up",
+    name: "Pull Up",
     description: "Latihan punggung atas dengan menggantung di pull-up bar.",
     body_part: "Back",
     equipment: "Pull-up Bar",
@@ -111,7 +111,7 @@ export const mockExercises: Exercise[] = [
   },
   {
     id: "7",
-    title: "Barbell Bench Press",
+    name: "Barbell Bench Press",
     description: "Latihan dada utama dengan barbell di atas bench.",
     body_part: "Chest",
     equipment: "Barbell",
@@ -129,7 +129,7 @@ export const mockExercises: Exercise[] = [
   },
   {
     id: "8",
-    title: "Dumbbell Bicep Curl",
+    name: "Dumbbell Bicep Curl",
     description: "Latihan isolasi untuk otot lengan depan.",
     body_part: "Arms",
     equipment: "Dumbbell",
@@ -147,7 +147,7 @@ export const mockExercises: Exercise[] = [
   },
   {
     id: "9",
-    title: "Walking Lunge",
+    name: "Walking Lunge",
     description: "Latihan kaki unilateral untuk glutes dan paha.",
     body_part: "Legs",
     equipment: "Dumbbell",
@@ -165,8 +165,9 @@ export const mockExercises: Exercise[] = [
   },
   {
     id: "10",
-    title: "Burpee",
-    description: "Gerakan full-body intensitas tinggi untuk kardio dan kekuatan.",
+    name: "Burpee",
+    description:
+      "Gerakan full-body intensitas tinggi untuk kardio dan kekuatan.",
     body_part: "Full Body",
     equipment: "Body Weight",
     target: "Cardiovascular",

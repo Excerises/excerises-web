@@ -15,7 +15,9 @@ export default function NewsEditPage() {
 
   if (!news) {
     return (
-      <AdminLayout breadcrumbs={[["Master Data", "/admin/news"], ["News"], ["Edit"]]}>
+      <AdminLayout
+        breadcrumbs={[["Master Data", "/admin/news"], ["News"], ["Edit"]]}
+      >
         <Card className="mx-auto w-full max-w-md">
           <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
             <span className="flex size-12 items-center justify-center rounded-full bg-muted">
@@ -50,7 +52,9 @@ export default function NewsEditPage() {
   };
 
   return (
-    <AdminLayout breadcrumbs={[["Master Data", "/admin/news"], ["News"], ["Edit"]]}>
+    <AdminLayout
+      breadcrumbs={[["Master Data", "/admin/news"], ["News"], ["Edit"]]}
+    >
       <div className="flex flex-wrap items-center gap-2">
         <Button variant="ghost" size="sm" onClick={() => router.back()}>
           <ArrowLeft className="size-4" />
@@ -61,7 +65,7 @@ export default function NewsEditPage() {
         initial={{
           title: news.title,
           description: news.description ?? "",
-          thumbnail: news.thumbnail ?? "",
+          image: news.image ?? "",
           status: news.status,
           content: news.content,
         }}

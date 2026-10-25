@@ -110,7 +110,9 @@ export default function ExerciseDetailPage() {
       label: "Steps",
       value: `${steps.length} langkah`,
       hint:
-        steps.length > 0 ? `${secondary.length} otot sekunder` : "Belum ada panduan",
+        steps.length > 0
+          ? `${secondary.length} otot sekunder`
+          : "Belum ada panduan",
     },
   ];
 
@@ -157,7 +159,7 @@ export default function ExerciseDetailPage() {
               <div className="min-w-0 flex-1 space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-xl font-semibold tracking-tight text-balance sm:text-2xl">
-                    {exercise.title}
+                    {exercise.name}
                   </h1>
                   <Badge variant={difficultyVariant(exercise.difficulty)}>
                     <Gauge className="size-3" />
@@ -224,7 +226,7 @@ export default function ExerciseDetailPage() {
               <CardHeader>
                 <CardTitle>Instructions</CardTitle>
                 <CardDescription>
-                  Panduan langkah demi langkah untuk {exercise.title}.
+                  Panduan langkah demi langkah untuk {exercise.name}.
                 </CardDescription>
                 <CardAction>
                   <Badge variant="outline" className="tabular-nums">

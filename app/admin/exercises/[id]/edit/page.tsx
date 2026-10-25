@@ -34,19 +34,22 @@ const difficultyOptions = [
   {
     value: "Beginner",
     hint: "Ringan, cocok pemula",
-    activeClass: "border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    activeClass:
+      "border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
     dotClass: "bg-emerald-500",
   },
   {
     value: "Intermediate",
     hint: "Butuh pengalaman dasar",
-    activeClass: "bg-amber-500/10 text-amber-700 border-amber-500/50 dark:text-amber-400",
+    activeClass:
+      "bg-amber-500/10 text-amber-700 border-amber-500/50 dark:text-amber-400",
     dotClass: "bg-amber-500",
   },
   {
     value: "Advanced",
     hint: "Intensitas tinggi",
-    activeClass: "bg-rose-500/10 text-rose-700 border-rose-500/50 dark:text-rose-400",
+    activeClass:
+      "bg-rose-500/10 text-rose-700 border-rose-500/50 dark:text-rose-400",
     dotClass: "bg-rose-500",
   },
 ] as const;
@@ -56,7 +59,7 @@ export default function ExerciseEditPage() {
   const params = useParams<{ id: string }>();
   const exercise = mockExercises.find((e) => String(e.id) === params.id);
 
-  const [title, setTitle] = useState(exercise?.title ?? "");
+  const [title, setTitle] = useState(exercise?.name ?? "");
   const [description, setDescription] = useState(exercise?.description ?? "");
   const [bodyPart, setBodyPart] = useState(exercise?.body_part ?? "");
   const [equipment, setEquipment] = useState(exercise?.equipment ?? "");
@@ -143,7 +146,7 @@ export default function ExerciseEditPage() {
   };
 
   const dirty =
-    title !== (exercise.title ?? "") ||
+    title !== (exercise.name ?? "") ||
     description !== (exercise.description ?? "") ||
     bodyPart !== (exercise.body_part ?? "") ||
     equipment !== (exercise.equipment ?? "") ||
@@ -176,7 +179,11 @@ export default function ExerciseEditPage() {
               >
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={saving || !title.trim()}>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={saving || !title.trim()}
+              >
                 {saving ? (
                   <Loader2 className="size-4 animate-spin" />
                 ) : (
@@ -196,7 +203,7 @@ export default function ExerciseEditPage() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <h1 className="truncate text-xl font-semibold tracking-tight">
-                    {title.trim() || exercise.title}
+                    {title.trim() || exercise.name}
                   </h1>
                   <p className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
                     <span className="tabular-nums">ID: {exercise.id}</span>
@@ -306,9 +313,7 @@ export default function ExerciseEditPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="secondary_muscles">
-                      Secondary Muscles
-                    </Label>
+                    <Label htmlFor="secondary_muscles">Secondary Muscles</Label>
                     <Input
                       id="secondary_muscles"
                       value={secondaryMuscles}
@@ -340,7 +345,9 @@ export default function ExerciseEditPage() {
                       value={instructions}
                       onChange={(e) => setInstructions(e.target.value)}
                       rows={6}
-                      placeholder={"Tangan selebar bahu\nTurunkan badan\nDorong kembali"}
+                      placeholder={
+                        "Tangan selebar bahu\nTurunkan badan\nDorong kembali"
+                      }
                     />
                     {stepsPreview.length > 0 && (
                       <ol className="space-y-2 rounded-xl bg-muted/60 p-3.5">
@@ -385,7 +392,10 @@ export default function ExerciseEditPage() {
                         )}
                       >
                         <span
-                          className={cn("size-2.5 shrink-0 rounded-full", opt.dotClass)}
+                          className={cn(
+                            "size-2.5 shrink-0 rounded-full",
+                            opt.dotClass,
+                          )}
                         />
                         <span className="min-w-0 flex-1">
                           <span className="block text-sm font-semibold">
@@ -407,7 +417,9 @@ export default function ExerciseEditPage() {
                     <Layers className="size-4 text-muted-foreground" />
                     Summary
                   </CardTitle>
-                  <CardDescription>Live preview sebelum disimpan.</CardDescription>
+                  <CardDescription>
+                    Live preview sebelum disimpan.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
                   <div className="flex items-center gap-2.5">
@@ -419,12 +431,15 @@ export default function ExerciseEditPage() {
                         {title.trim() || "-"}
                       </p>
                       <p className="truncate text-xs text-muted-foreground">
-                        {[bodyPart, equipment].filter(Boolean).join(" · ") || "-"}
+                        {[bodyPart, equipment].filter(Boolean).join(" · ") ||
+                          "-"}
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    <Badge variant="secondary">{difficulty.toUpperCase()}</Badge>
+                    <Badge variant="secondary">
+                      {difficulty.toUpperCase()}
+                    </Badge>
                     {category && <Badge variant="outline">{category}</Badge>}
                     {target && <Badge variant="outline">{target}</Badge>}
                   </div>

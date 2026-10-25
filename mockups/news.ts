@@ -10,7 +10,8 @@ export const mockNews: News[] = [
     description: "Dasar pola makan seimbang untuk mendukung program latihan.",
     content:
       "Nutrisi adalah fondasi dari setiap program kebugaran.\nMulailah dengan menghitung kebutuhan kalori harian.\nPrioritaskan protein 1.6-2.2g per kg berat badan.\nJangan lupakan serat dari sayur dan buah.",
-    thumbnail: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&q=80",
+    image:
+      "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&q=80",
     status: "published",
     viewed_count: 1240,
     creator: user(0),
@@ -23,7 +24,8 @@ export const mockNews: News[] = [
     description: "Hindari cedera lutut dengan memperbaiki form squat.",
     content:
       "Squat adalah gerakan fundamental namun sering salah.\nJaga dada tetap tegak dan lutut sejajar jari kaki.\nJangan biarkan tumit terangkat.\nGunakan beban ringan dulu untuk melatih pola gerak.",
-    thumbnail: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=80",
+    image:
+      "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=80",
     status: "published",
     viewed_count: 986,
     creator: user(0),
@@ -60,7 +62,8 @@ export const mockNews: News[] = [
     description: "Dehidrasi 2% saja bisa menurunkan performa signifikan.",
     content:
       "Minum 500ml air 2 jam sebelum latihan.\nTambahkan 250ml tiap 20 menit selama latihan intens.\nElektrolit penting untuk sesi di atas 60 menit.\nUrin kuning pucat tanda hidrasi cukup.",
-    thumbnail: "https://images.unsplash.com/photo-1523362628745-0c100150b504?w=400&q=80",
+    image:
+      "https://images.unsplash.com/photo-1523362628745-0c100150b504?w=400&q=80",
     status: "published",
     viewed_count: 642,
     creator: user(7),
@@ -97,7 +100,8 @@ export const mockNews: News[] = [
     description: "Bracing dan valsalva untuk angkatan berat yang aman.",
     content:
       "Tarik napas dalam ke perut sebelum menurunkan beban.\nKencangkan core seperti menahan pukulan.\nHembuskan saat melewati titik tersulit.\nJangan menahan napas terlalu lama bagi pemula.",
-    thumbnail: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80",
+    image:
+      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80",
     status: "published",
     viewed_count: 418,
     creator: user(0),

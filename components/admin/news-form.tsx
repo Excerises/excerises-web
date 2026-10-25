@@ -35,7 +35,7 @@ import { cn } from "cn";
 export interface NewsFormValues {
   title: string;
   description: string;
-  thumbnail: string;
+  image: string;
   status: NewsStatus;
   content: string;
 }
@@ -65,8 +65,7 @@ const statusOptions: Array<{
   {
     value: "draft",
     hint: "Simpan dulu, terbitkan nanti",
-    activeClass:
-      "border-muted-foreground/30 bg-muted text-muted-foreground",
+    activeClass: "border-muted-foreground/30 bg-muted text-muted-foreground",
     dotClass: "bg-muted-foreground",
   },
 ];
@@ -81,7 +80,7 @@ export default function NewsForm({
 }: NewsFormProps) {
   const [title, setTitle] = useState(initial.title);
   const [description, setDescription] = useState(initial.description);
-  const [thumbnail, setThumbnail] = useState(initial.thumbnail);
+  const [image, setImage] = useState(initial.image);
   const [status, setStatus] = useState<NewsStatus>(initial.status);
   const [content, setContent] = useState(initial.content);
   const [saving, setSaving] = useState(false);
@@ -90,10 +89,10 @@ export default function NewsForm({
     () =>
       title !== initial.title ||
       description !== initial.description ||
-      thumbnail !== initial.thumbnail ||
+      image !== initial.image ||
       status !== initial.status ||
       content !== initial.content,
-    [title, description, thumbnail, status, content, initial],
+    [title, description, image, status, content, initial],
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -104,7 +103,7 @@ export default function NewsForm({
       await onSubmit({
         title: title.trim(),
         description: description.trim(),
-        thumbnail: thumbnail.trim(),
+        image: image.trim(),
         status,
         content: content.trim(),
       });
@@ -120,11 +119,11 @@ export default function NewsForm({
           <div className="h-16 bg-gradient-to-r from-primary/25 via-primary/10 to-transparent sm:h-20" />
           <CardContent className="-mt-7 pb-6 sm:-mt-8">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              {thumbnail.trim() ? (
+              {image.trim() ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={thumbnail.trim()}
-                  alt={title.trim() || "Thumbnail"}
+                  src={image.trim()}
+                  alt={title.trim() || "image"}
                   className="size-14 shrink-0 rounded-2xl object-cover shadow-lg ring-4 ring-background"
                 />
               ) : (
@@ -143,9 +142,7 @@ export default function NewsForm({
                       <span aria-hidden>·</span>
                     </>
                   )}
-                  <span className="tabular-nums">
-                    {meta?.views ?? 0} views
-                  </span>
+                  <span className="tabular-nums">{meta?.views ?? 0} views</span>
                   <span aria-hidden>·</span>
                   <span>{content.trim().length} karakter</span>
                   {dirty && (
@@ -168,7 +165,7 @@ export default function NewsForm({
                   Basic info
                 </CardTitle>
                 <CardDescription>
-                  Judul, deskripsi singkat, dan thumbnail berita.
+                  Judul, deskripsi singkat, dan image berita.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -198,24 +195,24 @@ export default function NewsForm({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="thumbnail">Thumbnail URL</Label>
+                  <Label htmlFor="image">image URL</Label>
                   <Input
-                    id="thumbnail"
-                    value={thumbnail}
-                    onChange={(e) => setThumbnail(e.target.value)}
+                    id="image"
+                    value={image}
+                    onChange={(e) => setImage(e.target.value)}
                     placeholder="https://..."
                     inputMode="url"
                   />
-                  {thumbnail.trim() && (
+                  {image.trim() && (
                     <div className="flex items-center gap-3 rounded-xl bg-muted/60 p-3">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={thumbnail.trim()}
-                        alt="Preview thumbnail"
+                        src={image.trim()}
+                        alt="Preview image"
                         className="h-14 w-20 shrink-0 rounded-lg object-cover ring-1 ring-foreground/10"
                       />
                       <p className="truncate text-xs text-muted-foreground">
-                        {thumbnail.trim()}
+                        {image.trim()}
                       </p>
                     </div>
                   )}
@@ -230,8 +227,8 @@ export default function NewsForm({
                   Content
                 </CardTitle>
                 <CardDescription>
-                  Isi berita dengan textarea sederhana, satu paragraf per
-                  baris kosong.
+                  Isi berita dengan textarea sederhana, satu paragraf per baris
+                  kosong.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
@@ -325,7 +322,9 @@ export default function NewsForm({
                   <ImageIcon className="size-4 text-muted-foreground" />
                   Summary
                 </CardTitle>
-                <CardDescription>Live preview sebelum disimpan.</CardDescription>
+                <CardDescription>
+                  Live preview sebelum disimpan.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 <p className="truncate font-semibold">{title.trim() || "-"}</p>
@@ -334,9 +333,7 @@ export default function NewsForm({
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   <Badge
-                    variant={
-                      status === "published" ? "default" : "secondary"
-                    }
+                    variant={status === "published" ? "default" : "secondary"}
                   >
                     {status.toUpperCase()}
                   </Badge>

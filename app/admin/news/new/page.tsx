@@ -18,7 +18,9 @@ export default function NewsNewPage() {
   };
 
   return (
-    <AdminLayout breadcrumbs={[["Master Data", "/admin/news"], ["News"], ["New"]]}>
+    <AdminLayout
+      breadcrumbs={[["Master Data", "/admin/news"], ["News"], ["New"]]}
+    >
       <div className="flex flex-wrap items-center gap-2">
         <Button variant="ghost" size="sm" onClick={() => router.back()}>
           <ArrowLeft className="size-4" />
@@ -29,7 +31,7 @@ export default function NewsNewPage() {
         initial={{
           title: "",
           description: "",
-          thumbnail: "",
+          image: "",
           status: "draft",
           content: "",
         }}

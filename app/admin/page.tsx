@@ -91,7 +91,7 @@ export default function AdminPage() {
     return [...mockExercises]
       .map((e, i) => ({
         id: e.id,
-        title: e.title,
+        title: e.name,
         category: e.category,
         bodyPart: e.body_part,
         difficulty: e.difficulty,
