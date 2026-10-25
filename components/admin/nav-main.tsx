@@ -66,7 +66,7 @@ function NavCollapsibleItem({
 
   return (
     <Collapsible
-      open={open}
+      open={true}
       onOpenChange={setOpen}
       className="group/collapsible"
       render={

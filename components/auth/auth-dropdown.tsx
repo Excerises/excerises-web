@@ -69,10 +69,12 @@ export function AuthDropdown({ renderTrigger }: AuthDropdownProps) {
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem render={<Link href="/admin"></Link>}>
-              <Monitor />
-              Dashboard
-            </DropdownMenuItem>
+            {user?.role == "admin" && (
+              <DropdownMenuItem render={<Link href="/admin"></Link>}>
+                <Monitor />
+                Dashboard
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem render={<Link href="/admin/account"></Link>}>
               <BadgeCheck />
               Account
