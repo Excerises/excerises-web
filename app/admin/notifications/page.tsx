@@ -83,7 +83,7 @@ export default function NotificationsPage() {
           .toLowerCase()
           .includes(debouncedSearch.toLowerCase()),
       ),
-    [notificationsQuery.data?.data],
+    [notificationsQuery.data?.data, debouncedSearch],
   );
 
   return (

@@ -53,17 +53,17 @@ const data: {
       url: "/notifications",
       icon: Bell,
     },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "/settings/general",
-        },
-      ],
-    },
+    // {
+    //   title: "Settings",
+    //   url: "#",
+    //   icon: Settings2,
+    //   items: [
+    //     {
+    //       title: "General",
+    //       url: "/settings/general",
+    //     },
+    //   ],
+    // },
     {
       title: "Account",
       url: "/account",
