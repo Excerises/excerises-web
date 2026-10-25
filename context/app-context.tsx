@@ -20,9 +20,12 @@ export function useAppEntry() {
       return;
     }
 
-    if (user && pathname.startsWith("/login")) {
+    if (user && user.role == "admin" && pathname.startsWith("/login")) {
       router.replace("/admin");
-    } else if (!user && pathname.startsWith("/admin")) {
+    } else if (
+      (!user || user.role !== "admin") &&
+      pathname.startsWith("/admin")
+    ) {
       router.replace("/login");
     }
 
