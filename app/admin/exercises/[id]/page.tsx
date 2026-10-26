@@ -12,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { mockExercises } from "@/mockups/exercises";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -29,6 +28,8 @@ import {
   Wrench,
 } from "lucide-react";
 import { cn } from "cn";
+import { useGetExerciseDetail } from "@/hooks/api/exercise/use-exercise-query";
+import { capitalize } from "@/lib/format";
 
 function difficultyVariant(difficulty: string) {
   switch (difficulty.toLowerCase()) {
@@ -59,9 +60,34 @@ function difficultyAccent(difficulty: string) {
 export default function ExerciseDetailPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const exercise = mockExercises.find((e) => String(e.id) === params.id);
+  const { query: exerciseQuery } = useGetExerciseDetail(params.id as never);
 
-  if (!exercise) {
+  if (exerciseQuery.isLoading) {
+    return (
+      <AdminLayout breadcrumbs={[["Master Data"], ["Exercise"], ["Detail"]]}>
+        <Card className="mx-auto w-full max-w-md">
+          <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+            <span className="flex size-12 items-center justify-center rounded-full bg-muted">
+              <Dumbbell className="size-6 text-muted-foreground" />
+            </span>
+            <div className="space-y-1">
+              <p className="font-medium">Memuat...</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push("/admin/exercises")}
+            >
+              <ArrowLeft className="size-4" />
+              Back to List
+            </Button>
+          </CardContent>
+        </Card>
+      </AdminLayout>
+    );
+  }
+
+  if (exerciseQuery.error || !exerciseQuery.data) {
     return (
       <AdminLayout breadcrumbs={[["Master Data"], ["Exercise"], ["Detail"]]}>
         <Card className="mx-auto w-full max-w-md">
@@ -81,7 +107,7 @@ export default function ExerciseDetailPage() {
               onClick={() => router.push("/admin/exercises")}
             >
               <ArrowLeft className="size-4" />
-              Kembali ke daftar
+              Back to List
             </Button>
           </CardContent>
         </Card>
@@ -89,6 +115,7 @@ export default function ExerciseDetailPage() {
     );
   }
 
+  const exercise = exerciseQuery.data.data;
   const steps = exercise.instructions ?? [];
   const secondary = exercise.secondary_muscles ?? [];
 
@@ -96,23 +123,23 @@ export default function ExerciseDetailPage() {
     {
       icon: Target,
       label: "Primary target",
-      value: exercise.target || "-",
-      hint: exercise.body_part || "Body part",
+      value: capitalize(exercise.target || "-"),
+      hint: capitalize(exercise.body_part || "Body part"),
     },
     {
       icon: Wrench,
       label: "Equipment",
-      value: exercise.equipment || "-",
-      hint: exercise.category || "Category",
+      value: capitalize(exercise.equipment || "-"),
+      hint: capitalize(exercise.category || "Category"),
     },
     {
       icon: ListOrdered,
       label: "Steps",
-      value: `${steps.length} langkah`,
+      value: `${steps.length} steps`,
       hint:
         steps.length > 0
-          ? `${secondary.length} otot sekunder`
-          : "Belum ada panduan",
+          ? `${secondary.length} secondary muscles`
+          : "No instructions yet",
     },
   ];
 
@@ -131,17 +158,6 @@ export default function ExerciseDetailPage() {
             <ArrowLeft className="size-4" />
             Back
           </Button>
-          <div className="ml-auto flex flex-wrap items-center gap-2">
-            <Button
-              size="sm"
-              onClick={() =>
-                router.push(`/admin/exercises/${exercise.id}/edit`)
-              }
-            >
-              <Pencil className="size-4" />
-              Edit exercise
-            </Button>
-          </div>
         </div>
 
         <Card className="overflow-hidden pt-0">
@@ -159,7 +175,7 @@ export default function ExerciseDetailPage() {
               <div className="min-w-0 flex-1 space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-xl font-semibold tracking-tight text-balance sm:text-2xl">
-                    {exercise.name}
+                    {capitalize(exercise.name)}
                   </h1>
                   <Badge variant={difficultyVariant(exercise.difficulty)}>
                     <Gauge className="size-3" />
@@ -175,19 +191,19 @@ export default function ExerciseDetailPage() {
                   {exercise.category && (
                     <Badge variant="outline">
                       <Tag className="size-3" />
-                      {exercise.category}
+                      {capitalize(exercise.category)}
                     </Badge>
                   )}
                   {exercise.body_part && (
                     <Badge variant="secondary">
                       <LayoutGrid className="size-3" />
-                      {exercise.body_part}
+                      {capitalize(exercise.body_part)}
                     </Badge>
                   )}
                   {exercise.equipment && (
                     <Badge variant="secondary">
                       <Wrench className="size-3" />
-                      {exercise.equipment}
+                      {capitalize(exercise.equipment)}
                     </Badge>
                   )}
                 </div>
@@ -226,7 +242,7 @@ export default function ExerciseDetailPage() {
               <CardHeader>
                 <CardTitle>Instructions</CardTitle>
                 <CardDescription>
-                  Panduan langkah demi langkah untuk {exercise.name}.
+                  Step-by-step guide for {capitalize(exercise.name)}.
                 </CardDescription>
                 <CardAction>
                   <Badge variant="outline" className="tabular-nums">
@@ -255,7 +271,7 @@ export default function ExerciseDetailPage() {
                   </ol>
                 ) : (
                   <p className="rounded-lg bg-muted/60 px-3.5 py-3 text-sm text-muted-foreground">
-                    Belum ada instruksi untuk exercise ini.
+                    No instructions yet.
                   </p>
                 )}
               </CardContent>
@@ -264,9 +280,7 @@ export default function ExerciseDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Muscle focus</CardTitle>
-                <CardDescription>
-                  Otot utama dan pendukung yang dilatih.
-                </CardDescription>
+                <CardDescription>Primary muscle to train.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-3 rounded-xl bg-muted/60 px-3.5 py-3">
@@ -307,7 +321,7 @@ export default function ExerciseDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Overview</CardTitle>
-                <CardDescription>Klasifikasi exercise.</CardDescription>
+                <CardDescription>Exercise classification.</CardDescription>
               </CardHeader>
               <CardContent className="divide-y divide-border">
                 {overview.map((row) => (
@@ -376,32 +390,6 @@ export default function ExerciseDetailPage() {
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="h-fit">
-              <CardHeader>
-                <CardTitle>Quick actions</CardTitle>
-                <CardDescription>Kelola exercise ini.</CardDescription>
-              </CardHeader>
-              <CardContent className="gap-2">
-                <Button
-                  className="w-full justify-start"
-                  onClick={() =>
-                    router.push(`/admin/exercises/${exercise.id}/edit`)
-                  }
-                >
-                  <Pencil className="size-4" />
-                  Edit exercise
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => router.push("/admin/exercises")}
-                >
-                  <LayoutGrid className="size-4" />
-                  All exercises
-                </Button>
               </CardContent>
             </Card>
           </div>

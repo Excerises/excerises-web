@@ -23,3 +23,19 @@ export function useGetExercises() {
 
   return { query, search, setSearch, debouncedSearch, pagination };
 }
+
+export function useGetExerciseDetail(exerciseId: never) {
+  const query = useQuery({
+    queryKey: ["get-exercise-detail"],
+    queryFn: async () => {
+      const res = await api.client.get<ApiResponse<Exercise>>(
+        `/exercises/${exerciseId}`,
+      );
+
+      return res.data;
+    },
+    enabled: !!exerciseId,
+  });
+
+  return { query };
+}

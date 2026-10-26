@@ -162,19 +162,6 @@ export default function ExercisesPage() {
                 >
                   Detail
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() =>
-                    router.push(`/admin/exercises/${exercise.id}/edit`)
-                  }
-                >
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  variant="destructive"
-                  onClick={() => handleDelete(exercise)}
-                >
-                  Delete
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           );
