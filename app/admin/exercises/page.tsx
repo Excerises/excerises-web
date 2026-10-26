@@ -41,10 +41,8 @@ function difficultyVariant(difficulty: string) {
   }
 }
 
-function nowString() {
-  const d = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+function listString(list: string[]) {
+  return `[${list.map((s) => `'${s}'`).join(",")}]`;
 }
 
 export default function ExercisesPage() {
@@ -56,9 +54,6 @@ export default function ExercisesPage() {
     debouncedSearch,
     pagination,
   } = useGetExercises();
-  const [exerciseToDelete, setExerciseToDelete] = useState<Exercise | null>(
-    null,
-  );
   const [importNotice, setImportNotice] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const features = tableFeatures({
@@ -73,17 +68,6 @@ export default function ExercisesPage() {
         .includes(debouncedSearch.toLowerCase()),
     );
   }, [exercisesQuery.data?.data, debouncedSearch]);
-
-  const handleDelete = (exercise: Exercise) => {
-    setExerciseToDelete(exercise);
-  };
-
-  const handleConfirmDelete = () => {
-    if (!exerciseToDelete) return;
-
-    // TODO: replace with a real delete API call
-    setExerciseToDelete(null);
-  };
 
   const columns = useMemo<Array<ColumnDef<typeof features, Exercise>>>(
     () => [
@@ -181,19 +165,20 @@ export default function ExercisesPage() {
 
   async function handleDownloadTemplate() {
     const XLSX = await import("xlsx");
-    const worksheet = XLSX.utils.json_to_sheet([
-      {
-        name: "Push Up",
-        description: "Latihan dada dengan berat badan.",
-        body_part: "Chest",
-        equipment: "Body Weight",
-        target: "Pectorals",
-        secondary_muscles: "Triceps, Shoulders",
-        instructions: "Tangan selebar bahu; Turunkan badan; Dorong kembali",
-        difficulty: "Beginner",
-        category: "Strength",
-      },
-    ]);
+    const worksheet = XLSX.utils.json_to_sheet(
+      (exercisesQuery.data?.data.data || []).map((exercise) => ({
+        id: exercise.id,
+        name: exercise.name,
+        description: exercise.description,
+        body_part: exercise.body_part,
+        equipment: exercise.equipment,
+        target: exercise.target,
+        secondary_muscles: listString(exercise.secondary_muscles),
+        instructions: listString(exercise.instructions),
+        difficulty: exercise.difficulty,
+        category: exercise.category,
+      })),
+    );
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "exercises");
     XLSX.writeFile(workbook, "template-exercises.xlsx");
@@ -265,18 +250,6 @@ export default function ExercisesPage() {
         onCurrentPageChange={pagination.setPage}
         perPage={pagination.limit}
         onPerPageChange={pagination.setLimit}
-      />
-      <ConfirmDialog
-        open={exerciseToDelete !== null}
-        onOpenChange={(open) => {
-          if (!open) setExerciseToDelete(null);
-        }}
-        title="Delete Exercise?"
-        description={`Are you sure you want to delete "${exerciseToDelete?.name ?? ""}"? This action cannot be undone.`}
-        cancelText="Cancel"
-        confirmText="Delete"
-        confirmVariant="destructive"
-        onConfirm={handleConfirmDelete}
       />
     </AdminLayout>
   );
