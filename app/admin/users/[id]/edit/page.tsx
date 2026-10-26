@@ -16,7 +16,10 @@ import { Field, FieldDescription, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { mockUsers } from "@/mockups/users";
+import { useGetUserDetail, useUpdateUser } from "@/hooks/api/user/use-user-query";
+import { getApiErrorMessage } from "@/network/api";
+import { toast } from "@/components/ui/toast";
+import { Spinner } from "@/components/ui/spinner";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -44,12 +47,32 @@ function initials(name: string) {
 export default function UserEditPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const user = mockUsers.find((u) => String(u.id) === params.id);
+  const { query: userQuery } = useGetUserDetail(params.id);
+  const update = useUpdateUser();
+  const user = userQuery.data?.data;
 
   const [name, setName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
   const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
-  const [saving, setSaving] = useState(false);
+  const [prevUser, setPrevUser] = useState(user);
+
+  if (user && user !== prevUser) {
+    setPrevUser(user);
+    setName(user.name);
+    setEmail(user.email);
+  }
+
+  const saving = update.mutation.isPending;
+
+  if (userQuery.isLoading) {
+    return (
+      <AdminLayout breadcrumbs={[["Master Data"], ["User"], ["Edit"]]}>
+        <div className="flex items-center justify-center py-24">
+          <Spinner />
+        </div>
+      </AdminLayout>
+    );
+  }
 
   if (!user) {
     return (
@@ -94,14 +117,30 @@ export default function UserEditPage() {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    setSaving(true);
-    console.log("Update user", {
-      id: user.id,
-      name: name.trim(),
-      email: email.trim(),
-    });
-    setSaving(false);
-    router.push(`/admin/users/${user.id}`);
+    update.mutation.mutate(
+      { userId: user.id, req: { name: name.trim(), email: email.trim() } },
+      {
+        onSuccess: () => {
+          toast.add({
+            type: "success",
+            title: "User updated",
+            description: `Changes for "${name.trim()}" have been saved.`,
+          });
+          router.push(`/admin/users/${user.id}`);
+        },
+        onError: (error) => {
+          const message = getApiErrorMessage(error);
+          if (message.toLowerCase().includes("email")) {
+            setErrors({ email: message });
+          }
+          toast.add({
+            type: "error",
+            title: "Update failed",
+            description: message,
+          });
+        },
+      },
+    );
   };
 
   return (

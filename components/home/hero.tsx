@@ -1,4 +1,5 @@
 import { Activity, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { APP_NAME } from "@/constant/app";
@@ -46,6 +47,27 @@ export default function Hero() {
               <TrendingUp className="size-4 text-primary" /> Adapts as you grow
             </span>
           </div>
+        </div>
+        <div className="relative flex items-center justify-center lg:justify-end">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-20 size-[28rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklch,var(--primary)_25%,transparent),transparent_70%)] blur-2xl"
+          />
+          <div
+  aria-hidden
+  className="pointer-events-none absolute -right-24 size-[36rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklch,var(--primary)_25%,transparent),transparent_70%)] blur-2xl"
+ />
+
+<div className="relative w-full min-w-0 rounded-3xl bg-[radial-gradient(circle_at_50%_50%,color-mix(in_oklch,var(--primary)_12%,transparent),transparent_70%)] p-2 lg:-mr-12 xl:-mr-20">
+  <Image
+    src="/hero-illustration.png"
+    alt={`${APP_NAME} fitness illustration`}
+    width={1000}
+    height={667}
+    priority
+    className="h-auto w-full max-w-none scale-110 object-contain"
+  />
+</div>
         </div>
       </div>
 

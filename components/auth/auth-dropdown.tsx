@@ -16,6 +16,7 @@ import { useAuth } from "@/context/auth-context";
 import Link from "next/link";
 import { BadgeCheck, Bell, LogOut, Monitor } from "lucide-react";
 import ConfirmDialog from "../ui/confirm-dialog";
+import { useRouter } from "next/navigation";
 
 export type AuthDropdownProps = {
   renderTrigger?:
@@ -25,10 +26,11 @@ export type AuthDropdownProps = {
 };
 
 export function AuthDropdown({ renderTrigger }: AuthDropdownProps) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const isMobile = useIsMobile();
 
   const [logoutOpen, setLogoutOpen] = useState(false);
+  const router = useRouter();
 
   const avatarFallback = user?.name.slice(0, 2).toUpperCase();
 
@@ -101,7 +103,10 @@ export function AuthDropdown({ renderTrigger }: AuthDropdownProps) {
         cancelText="Cancel"
         confirmText="Log out"
         confirmVariant="destructive"
-        onConfirm={() => {}}
+        onConfirm={async () => {
+          await logout();
+          router.push("/");
+        }}
       />
     </>
   );

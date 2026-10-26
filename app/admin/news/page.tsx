@@ -24,8 +24,10 @@ import {
 } from "@tanstack/react-table";
 import { EyeIcon, MoreHorizontalIcon, PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useGetNews } from "@/hooks/api/news/use-news-query";
+import { useDeleteNews, useGetNews } from "@/hooks/api/news/use-news-query";
+import { getApiErrorMessage } from "@/network/api";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "@/components/ui/toast";
 
 function statusVariant(status: string) {
   switch (status.toLowerCase()) {
@@ -49,6 +51,7 @@ export default function NewsPage() {
 
   const router = useRouter();
   const [newsToDelete, setNewsToDelete] = useState<News | null>(null);
+  const deleteNews = useDeleteNews();
   const features = tableFeatures({
     rowPaginationFeature: rowPaginationFeature,
     paginatedRowModel: createPaginatedRowModel(),
@@ -66,8 +69,27 @@ export default function NewsPage() {
   const handleConfirmDelete = () => {
     if (!newsToDelete) return;
 
-    // TODO: replace with a real delete API call
+    const target = newsToDelete;
     setNewsToDelete(null);
+    deleteNews.mutation.mutate(
+      { newsId: target.id },
+      {
+        onSuccess: () => {
+          toast.add({
+            type: "success",
+            title: "News deleted",
+            description: `"${target.title}" has been deleted.`,
+          });
+        },
+        onError: (error) => {
+          toast.add({
+            type: "error",
+            title: "Delete failed",
+            description: getApiErrorMessage(error),
+          });
+        },
+      },
+    );
   };
 
   const columns = useMemo<Array<ColumnDef<typeof features, News>>>(

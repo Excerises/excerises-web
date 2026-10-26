@@ -21,8 +21,13 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import DataTable from "@/components/ui/table/data-table";
-import { mockUsers } from "@/mockups/users";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  useGetUserDetail,
+  useGetUserSessions,
+} from "@/hooks/api/user/use-user-query";
 import { ColumnDef, tableFeatures } from "@tanstack/react-table";
+import moment from "moment";
 import { useParams, useRouter } from "next/navigation";
 import {
   Activity,
@@ -49,38 +54,6 @@ type WorkoutHistory = {
   date: string;
 };
 
-// TODO: replace with real data from mockups/workout-history or an API,
-// filtered by user.id
-const mockWorkoutHistory: WorkoutHistory[] = [
-  {
-    id: 1,
-    workoutName: "Bench Press",
-    target: "Chest",
-    bodyPart: "Upper",
-    equipment: "Barbell",
-    category: "Strength",
-    date: "15 Sep 2026",
-  },
-  {
-    id: 2,
-    workoutName: "Squat",
-    target: "Quads",
-    bodyPart: "Lower",
-    equipment: "Barbell",
-    category: "Strength",
-    date: "14 Sep 2026",
-  },
-  {
-    id: 3,
-    workoutName: "Bicep Curl",
-    target: "Biceps",
-    bodyPart: "Upper",
-    equipment: "Dumbbell",
-    category: "Strength",
-    date: "13 Sep 2026",
-  },
-];
-
 function initials(name: string) {
   return name
     .split(" ")
@@ -93,8 +66,28 @@ function initials(name: string) {
 export default function UserDetailPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const user = mockUsers.find((u) => String(u.id) === params.id);
+  const { query: userQuery } = useGetUserDetail(params.id);
+  const { query: sessionsQuery } = useGetUserSessions(params.id);
+  const user = userQuery.data?.data;
   const [activeTab, setActiveTab] = useState<DetailTab>("detail");
+
+  const workoutHistory = useMemo<WorkoutHistory[]>(() => {
+    const sessions = sessionsQuery.data?.data ?? [];
+
+    return sessions.flatMap((session) =>
+      (session.exercises ?? []).map((se) => ({
+        id: se.id,
+        workoutName: se.exercise?.name ?? session.name ?? "Workout",
+        target: se.exercise?.target ?? "-",
+        bodyPart: se.exercise?.body_part ?? "-",
+        equipment: se.exercise?.equipment ?? "-",
+        category: se.exercise?.category ?? "-",
+        date: session.created_at
+          ? moment(session.created_at).format("DD MMM YYYY")
+          : "-",
+      })),
+    );
+  }, [sessionsQuery.data?.data]);
 
   const features = tableFeatures({});
   const columns: Array<ColumnDef<typeof features, WorkoutHistory>> = [
@@ -160,12 +153,12 @@ export default function UserDetailPage() {
   ];
 
   const stats = useMemo(() => {
-    const categories = new Set(mockWorkoutHistory.map((w) => w.category));
+    const categories = new Set(workoutHistory.map((w) => w.category));
     return [
       {
         icon: Activity,
         label: "Total workouts",
-        value: String(mockWorkoutHistory.length),
+        value: String(workoutHistory.length),
         hint: "Logged sessions",
       },
       {
@@ -177,11 +170,21 @@ export default function UserDetailPage() {
       {
         icon: Clock3,
         label: "Last activity",
-        value: mockWorkoutHistory[0]?.date ?? "-",
-        hint: mockWorkoutHistory[0]?.workoutName ?? "No activity yet",
+        value: workoutHistory[0]?.date ?? "-",
+        hint: workoutHistory[0]?.workoutName ?? "No activity yet",
       },
     ];
-  }, []);
+  }, [workoutHistory]);
+
+  if (userQuery.isLoading) {
+    return (
+      <AdminLayout breadcrumbs={[["Master Data"], ["User"], ["Detail"]]}>
+        <div className="flex items-center justify-center py-24">
+          <Spinner />
+        </div>
+      </AdminLayout>
+    );
+  }
 
   if (!user) {
     return (
@@ -315,7 +318,7 @@ export default function UserDetailPage() {
             <TabsTrigger value="workout-history">
               Workout history
               <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[11px]">
-                {mockWorkoutHistory.length}
+                {workoutHistory.length}
               </Badge>
             </TabsTrigger>
           </TabsList>
@@ -443,14 +446,14 @@ export default function UserDetailPage() {
                 </CardDescription>
                 <CardAction>
                   <Badge variant="outline" className="tabular-nums">
-                    {mockWorkoutHistory.length} sessions
+                    {workoutHistory.length} sessions
                   </Badge>
                 </CardAction>
               </CardHeader>
               <CardContent>
                 <DataTable
                   columns={columns}
-                  data={mockWorkoutHistory}
+                  data={workoutHistory}
                   features={features}
                   tableKey="user-workout-history-table"
                 />

@@ -24,8 +24,10 @@ import {
 import { MoreHorizontalIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { useGetUsers } from "@/hooks/api/user/use-user-query";
+import { useDeleteUser, useGetUsers } from "@/hooks/api/user/use-user-query";
+import { getApiErrorMessage } from "@/network/api";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "@/components/ui/toast";
 
 export default function UsersPage() {
   const {
@@ -37,6 +39,7 @@ export default function UsersPage() {
   } = useGetUsers();
   const router = useRouter();
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const deleteUser = useDeleteUser();
 
   const filteredUsers = useMemo(() => {
     return (usersQuery.data?.data || []).filter((u) =>
@@ -58,8 +61,27 @@ export default function UsersPage() {
   const handleConfirmDelete = () => {
     if (!userToDelete) return;
 
-    // TODO: replace with a real delete API call
+    const target = userToDelete;
     setUserToDelete(null);
+    deleteUser.mutation.mutate(
+      { userId: target.id },
+      {
+        onSuccess: () => {
+          toast.add({
+            type: "success",
+            title: "User deleted",
+            description: `"${target.name}" has been deleted.`,
+          });
+        },
+        onError: (error) => {
+          toast.add({
+            type: "error",
+            title: "Delete failed",
+            description: getApiErrorMessage(error),
+          });
+        },
+      },
+    );
   };
 
   const columns = useMemo<Array<ColumnDef<typeof features, User>>>(

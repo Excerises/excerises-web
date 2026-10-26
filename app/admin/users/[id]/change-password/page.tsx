@@ -16,7 +16,13 @@ import { Field, FieldDescription, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { mockUsers } from "@/mockups/users";
+import {
+  useGetUserDetail,
+  useUpdateUserPassword,
+} from "@/hooks/api/user/use-user-query";
+import { getApiErrorMessage } from "@/network/api";
+import { toast } from "@/components/ui/toast";
+import { Spinner } from "@/components/ui/spinner";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
@@ -43,14 +49,16 @@ function initials(name: string) {
 export default function ChangePasswordPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const user = mockUsers.find((u) => String(u.id) === params.id);
+  const { query: userQuery } = useGetUserDetail(params.id);
+  const updatePassword = useUpdateUserPassword();
+  const user = userQuery.data?.data;
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
-  const [saving, setSaving] = useState(false);
+  const saving = updatePassword.mutation.isPending;
 
   const checks = useMemo(
     () => [
@@ -83,6 +91,18 @@ export default function ChangePasswordPage() {
         : strength === 2
           ? "Cukup"
           : "Kuat";
+
+  if (userQuery.isLoading) {
+    return (
+      <AdminLayout
+        breadcrumbs={[["Master Data"], ["User"], ["Change Password"]]}
+      >
+        <div className="flex items-center justify-center py-24">
+          <Spinner />
+        </div>
+      </AdminLayout>
+    );
+  }
 
   if (!user) {
     return (
@@ -129,10 +149,28 @@ export default function ChangePasswordPage() {
       return;
     }
 
-    setSaving(true);
-    console.log("Change password for", user.id);
-    setSaving(false);
-    router.push(`/admin/users/${user.id}`);
+    updatePassword.mutation.mutate(
+      { userId: user.id, password },
+      {
+        onSuccess: () => {
+          toast.add({
+            type: "success",
+            title: "Password updated",
+            description: `Password for "${user.name}" has been changed.`,
+          });
+          router.push(`/admin/users/${user.id}`);
+        },
+        onError: (err) => {
+          const message = getApiErrorMessage(err);
+          setError(message);
+          toast.add({
+            type: "error",
+            title: "Update failed",
+            description: message,
+          });
+        },
+      },
+    );
   };
 
   return (

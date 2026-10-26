@@ -94,3 +94,19 @@ class ApiNetwork {
 }
 
 export const api = new ApiNetwork();
+
+/** Extract a human readable message from an API (axios) error. */
+export function getApiErrorMessage(
+  error: unknown,
+  fallback = "Something went wrong. Please try again.",
+): string {
+  if (error instanceof AxiosError) {
+    const data = error.response?.data as
+      | { detail?: string; message?: string }
+      | undefined;
+
+    return data?.detail || data?.message || fallback;
+  }
+
+  return fallback;
+}
