@@ -5,17 +5,22 @@ import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form/form-control";
 import { Input } from "@/components/ui/input";
 import { useLogin, useLoginForm } from "@/hooks/api/auth/use-login";
+import { getError } from "@/lib/error";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function LoginPage() {
   const { mutation } = useLogin();
-  const { control, handleSubmit } = useLoginForm();
+  const { control, handleSubmit, setError } = useLoginForm();
   const [showPassword, setShowPassword] = useState(false);
 
   const onLogin = handleSubmit(async (v) => {
-    await mutation.mutateAsync(v);
+    try {
+      await mutation.mutateAsync(v);
+    } catch (err) {
+      setError("password", { message: getError(err) });
+    }
   });
 
   return (

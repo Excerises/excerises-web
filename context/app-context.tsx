@@ -20,12 +20,13 @@ export function useAppEntry() {
       return;
     }
 
-    if (user && user.role == "admin" && pathname.startsWith("/login")) {
-      router.replace("/admin");
-    } else if (
-      (!user || user.role !== "admin") &&
-      pathname.startsWith("/admin")
-    ) {
+    if (user && pathname.startsWith("/login")) {
+      if (user.role == "admin") {
+        router.replace("/admin");
+      } else {
+        router.replace("/");
+      }
+    } else if (!user && pathname.startsWith("/admin")) {
       router.replace("/login");
     }
 
