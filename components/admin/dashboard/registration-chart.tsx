@@ -10,14 +10,18 @@ import {
 import { useTheme } from "next-themes";
 import ReactApexChart from "react-apexcharts";
 
-export default function RegistrationChart() {
+export interface RegistrationChartProps {
+  dataset: number[];
+}
+
+export default function RegistrationChart({ dataset }: RegistrationChartProps) {
   const { theme } = useTheme();
 
   return (
     <Card className="h-full">
       <CardHeader>
         <CardTitle>User Registrations</CardTitle>
-        <CardDescription>Sign-ups per bulan tahun ini</CardDescription>
+        <CardDescription>Sign-ups per month this year</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="min-h-80 overflow-hidden rounded">
@@ -27,9 +31,7 @@ export default function RegistrationChart() {
             series={[
               {
                 name: "Sign-ups",
-                data: [
-                  210, 380, 340, 520, 480, 610, 700, 880, 820, 1040, 1180, 1520,
-                ],
+                data: dataset,
               },
             ]}
             options={{

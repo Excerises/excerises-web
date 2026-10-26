@@ -25,7 +25,7 @@ export default function RecentUsers({ users }: { users: User[] }) {
     <Card className="h-full">
       <CardHeader>
         <CardTitle>Recent Users</CardTitle>
-        <CardDescription>User terbaru yang mendaftar</CardDescription>
+        <CardDescription>New user registered to app.</CardDescription>
         <CardAction>
           <Link
             href="/admin/users"
@@ -52,7 +52,7 @@ export default function RecentUsers({ users }: { users: User[] }) {
                 variant={u.role === "admin" ? "default" : "secondary"}
                 className="shrink-0 text-[11px]"
               >
-                {u.role.toUpperCase()}
+                USER
               </Badge>
             </li>
           ))}

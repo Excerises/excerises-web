@@ -4,113 +4,73 @@ import AdminStatCard, {
   AdminStatCardProps,
 } from "@/components/admin/dashboard/stat-card";
 import DifficultyDonut from "@/components/admin/dashboard/difficulty-donut";
-import PopularExercises, {
-  PopularExerciseItem,
-} from "@/components/admin/dashboard/popular-exercises";
+import PopularExercises from "@/components/admin/dashboard/popular-exercises";
 import RecentUsers from "@/components/admin/dashboard/recent-users";
 import RegistrationChart from "@/components/admin/dashboard/registration-chart";
 import AdminLayout from "@/components/admin/layout";
-import { mockExercises } from "@/mockups/exercises";
-import { mockUsers } from "@/mockups/users";
-import {
-  ActivityIcon,
-  DumbbellIcon,
-  LayersIcon,
-  UsersIcon,
-} from "lucide-react";
+import { DumbbellIcon, LayersIcon, UsersIcon } from "lucide-react";
 import { useMemo } from "react";
-
-function parseDate(s?: string) {
-  if (!s) return 0;
-  return new Date(s.replace(" ", "T")).getTime() || 0;
-}
+import {
+  useGetDashboardPopularExercises,
+  useGetDashboardStat,
+  useGetDashboardUserRegistrations,
+} from "@/hooks/api/dashboard/use-dashboard-query";
+import { DashboardPopularExercise } from "@/types/api";
 
 export default function AdminPage() {
-  const stats: AdminStatCardProps[] = useMemo(() => {
-    const totalUsers = mockUsers.length;
-    const totalExercises = mockExercises.length;
-    const bodyParts = new Set(mockExercises.map((e) => e.body_part)).size;
+  const { query: statQuery } = useGetDashboardStat();
+  const { query: userQuery } = useGetDashboardUserRegistrations();
+  const { query: exerciseQuery } = useGetDashboardPopularExercises();
 
-    const latest = Math.max(...mockUsers.map((u) => parseDate(u.last_login)));
-    const active = mockUsers.filter(
-      (u) => latest - parseDate(u.last_login) <= 7 * 24 * 3600 * 1000,
-    ).length;
+  const stats: AdminStatCardProps[] = useMemo(() => {
+    if (!statQuery.data) {
+      return [];
+    }
+
+    const { total_users, total_exercises, total_body_parts } =
+      statQuery.data!.data;
 
     return [
       {
         label: "Total Users",
-        value: String(totalUsers),
+        value: String(total_users),
         icon: UsersIcon,
-        trend: "+12%",
-        subtitle: "vs bulan lalu",
       },
       {
         label: "Total Exercises",
-        value: String(totalExercises),
+        value: String(total_exercises),
         icon: DumbbellIcon,
-        trend: "+4",
-        subtitle: "bulan ini",
       },
       {
         label: "Body Parts",
-        value: String(bodyParts),
+        value: String(total_body_parts),
         icon: LayersIcon,
-        subtitle: "target otot ter-cover",
-      },
-      {
-        label: "Active (7d)",
-        value: String(active),
-        icon: ActivityIcon,
-        trend: "+8%",
-        subtitle: "login 7 hari terakhir",
       },
     ];
-  }, []);
+  }, [statQuery.data]);
 
   const difficulty = useMemo(() => {
-    const lower = (s: string) => s.toLowerCase();
     return {
-      beginner: mockExercises.filter((e) => lower(e.difficulty) === "beginner")
-        .length,
-      intermediate: mockExercises.filter(
-        (e) => lower(e.difficulty) === "intermediate",
-      ).length,
-      advanced: mockExercises.filter((e) => lower(e.difficulty) === "advanced")
-        .length,
+      beginner:
+        statQuery.data?.data.exercise_level_distribution.dataset[0] || 0,
+      intermediate:
+        statQuery.data?.data.exercise_level_distribution.dataset[1] || 0,
+      advanced:
+        statQuery.data?.data.exercise_level_distribution.dataset[2] || 0,
     };
-  }, []);
+  }, [statQuery.data]);
 
-  const popular: PopularExerciseItem[] = useMemo(() => {
-    const weight = (d: string) =>
-      d.toLowerCase() === "advanced"
-        ? 15
-        : d.toLowerCase() === "intermediate"
-          ? 8
-          : 3;
-    // TODO: ganti skor deterministik ini dengan viewed_count / completions dari API
-    return [...mockExercises]
-      .map((e, i) => ({
-        id: e.id,
-        title: e.name,
-        category: e.category,
-        bodyPart: e.body_part,
-        difficulty: e.difficulty,
-        completions: 120 - i * 7 + weight(e.difficulty),
-        rating: 4.9 - (i % 5) * 0.15,
-      }))
-      .sort((a, b) => b.completions - a.completions)
-      .slice(0, 5);
-  }, []);
+  const popular: DashboardPopularExercise[] = useMemo(() => {
+    return exerciseQuery.data?.data || [];
+  }, [exerciseQuery.data]);
 
   const recentUsers = useMemo(() => {
-    return [...mockUsers]
-      .sort((a, b) => parseDate(b.created_at) - parseDate(a.created_at))
-      .slice(0, 5);
-  }, []);
+    return userQuery.data?.data.recent_users || [];
+  }, [userQuery.data]);
 
   return (
     <AdminLayout breadcrumbs={[["Dashboard"]]}>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {stats.map((stat, i) => (
           <AdminStatCard key={i} {...stat} />
         ))}
@@ -118,7 +78,13 @@ export default function AdminPage() {
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <RegistrationChart />
+          <RegistrationChart
+            dataset={
+              userQuery.data?.data.dataset || [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              ]
+            }
+          />
         </div>
         <DifficultyDonut {...difficulty} />
       </div>

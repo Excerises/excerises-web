@@ -8,18 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { capitalize } from "@/lib/format";
+import { DashboardPopularExercise } from "@/types/api";
 import { FlameIcon } from "lucide-react";
 import Link from "next/link";
-
-export interface PopularExerciseItem {
-  id: string;
-  title: string;
-  category?: string;
-  bodyPart: string;
-  difficulty: string;
-  completions: number;
-  rating: number;
-}
 
 function difficultyVariant(difficulty: string) {
   switch (difficulty.toLowerCase()) {
@@ -37,10 +29,8 @@ function difficultyVariant(difficulty: string) {
 export default function PopularExercises({
   items,
 }: {
-  items: PopularExerciseItem[];
+  items: DashboardPopularExercise[];
 }) {
-  const max = Math.max(...items.map((i) => i.completions), 1);
-
   return (
     <Card className="h-full">
       <CardHeader>
@@ -48,10 +38,7 @@ export default function PopularExercises({
           <FlameIcon className="size-4 text-orange-500" />
           <CardTitle>Exercise Terpopuler</CardTitle>
         </div>
-        <CardDescription>
-          Berdasarkan total completions minggu ini
-          {/* TODO: ganti dengan viewed_count / completions dari API */}
-        </CardDescription>
+        <CardDescription>Based on users completions</CardDescription>
       </CardHeader>
       <CardContent>
         <ol className="flex flex-col gap-4">
@@ -66,7 +53,7 @@ export default function PopularExercises({
                     href={`/admin/exercises/${ex.id}`}
                     className="truncate text-sm font-medium hover:underline"
                   >
-                    {ex.title}
+                    {capitalize(ex.name)}
                   </Link>
                   <Badge
                     variant={difficultyVariant(ex.difficulty)}
@@ -77,16 +64,17 @@ export default function PopularExercises({
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span className="truncate">
-                    {ex.category ?? "-"} • {ex.bodyPart}
+                    {capitalize(ex.category ?? "-")} •{" "}
+                    {capitalize(ex.body_part)}
                   </span>
                   <span className="ml-auto shrink-0">
-                    ★ {ex.rating.toFixed(1)} • {ex.completions}x
+                    ★ {ex.usage_percentage.toFixed(1)}%
                   </span>
                 </div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-muted">
                   <div
                     className="h-full rounded-full bg-primary transition-all"
-                    style={{ width: `${(ex.completions / max) * 100}%` }}
+                    style={{ width: `${(ex.usage_percentage / 100) * 100}%` }}
                   />
                 </div>
               </div>

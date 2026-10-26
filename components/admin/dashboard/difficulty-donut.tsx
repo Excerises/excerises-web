@@ -25,7 +25,7 @@ export default function DifficultyDonut({
     <Card className="h-full">
       <CardHeader>
         <CardTitle>By Difficulty</CardTitle>
-        <CardDescription>Distribusi level kesulitan exercise</CardDescription>
+        <CardDescription>Exercise level distribution.</CardDescription>
       </CardHeader>
       <CardContent>
         <ReactApexChart

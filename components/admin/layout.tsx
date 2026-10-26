@@ -32,7 +32,7 @@ export default function AdminLayout({
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/">
+                <BreadcrumbLink href="/admin">
                   <HomeIcon className="size-4" />
                 </BreadcrumbLink>
               </BreadcrumbItem>
