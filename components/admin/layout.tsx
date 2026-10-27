@@ -1,4 +1,5 @@
 import { HomeIcon } from "lucide-react";
+import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -32,7 +33,7 @@ export default function AdminLayout({
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/admin">
+                <BreadcrumbLink render={<Link href="/admin"></Link>}>
                   <HomeIcon className="size-4" />
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -41,7 +42,9 @@ export default function AdminLayout({
                   <BreadcrumbSeparator />
                   {url ? (
                     <BreadcrumbItem>
-                      <BreadcrumbLink href={url}>{label}</BreadcrumbLink>
+                      <BreadcrumbLink render={<Link href={url}></Link>}>
+                        {label}
+                      </BreadcrumbLink>
                     </BreadcrumbItem>
                   ) : (
                     <BreadcrumbItem>
