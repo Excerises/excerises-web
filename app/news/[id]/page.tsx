@@ -30,22 +30,20 @@ export default function Page() {
         </div>
       ) : news ? (
         <>
-          {news.image && (
-            <div className="relative">
-              <HomeSection muted>
-                <img
-                  src={news.image}
-                  alt={news.title}
-                  className="absolute top-0 left-0 right-0 bottom-0 object-cover"
-                />
-              </HomeSection>
-            </div>
-          )}
           <HomeSection
             badge={`${news.viewed_count} viewed`}
             title={news.title}
             description={news.description}
           >
+            {news.image && (
+              <div className="flex justify-center bg-muted/40 rounded-lg overflow-hidden mb-10">
+                <img
+                  src={news.image}
+                  alt={news.title}
+                  className="max-w-full rounded-lg object-cover"
+                />
+              </div>
+            )}
             {news.content}
           </HomeSection>
         </>
