@@ -13,13 +13,13 @@ export default function Footer() {
           {APP_NAME}
         </span>
         <nav className="flex items-center gap-5">
-          <Link href="#features" className="hover:text-foreground">
+          <Link href="/#features" className="hover:text-foreground">
             Features
           </Link>
-          <Link href="#news" className="hover:text-foreground">
+          <Link href="/#news" className="hover:text-foreground">
             News
           </Link>
-          <Link href="#download" className="hover:text-foreground">
+          <Link href="/#download" className="hover:text-foreground">
             Download
           </Link>
         </nav>

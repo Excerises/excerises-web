@@ -7,15 +7,14 @@ import { APP_NAME } from "@/constant/app";
 import ThemeToggler from "@/components/theme-toggler";
 import Logo from "../logo";
 import { useAuth } from "@/context/auth-context";
-import { NavUser } from "../admin/nav-user";
 import { AuthDropdown } from "../auth/auth-dropdown";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home" },
-  { href: "#features", label: "Features" },
-  { href: "#how-it-works", label: "How It Works" },
-  { href: "#news", label: "News" },
-  { href: "#download", label: "Download" },
+  { href: "/#features", label: "Features" },
+  { href: "/#how-it-works", label: "How It Works" },
+  { href: "/#news", label: "News" },
+  { href: "/#download", label: "Download" },
 ];
 
 export default function Header() {
