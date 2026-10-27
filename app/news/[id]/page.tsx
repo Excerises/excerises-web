@@ -13,7 +13,6 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { useGetNewsDetail } from "@/hooks/api/news/use-news-query";
 import { FolderIcon } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -34,8 +33,7 @@ export default function Page() {
           {news.image && (
             <div className="relative">
               <HomeSection muted>
-                <Image
-                  fill
+                <img
                   src={news.image}
                   alt={news.title}
                   className="absolute top-0 left-0 right-0 bottom-0 object-cover"

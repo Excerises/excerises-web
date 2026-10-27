@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +20,7 @@ export default function NewsCard({ news }: NewsCardProps) {
   return (
     <Card className="overflow-hidden pt-0">
       <div className="relative">
-        <Image
+        <img
           src={news.image as never}
           alt={news.title}
           height={200}
