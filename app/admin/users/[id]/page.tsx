@@ -13,7 +13,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Tabs,
   TabsContent,
@@ -26,7 +40,9 @@ import {
   useGetUserDetail,
   useGetUserSessions,
 } from "@/hooks/api/user/use-user-query";
+import { AdminUserSessionExercise } from "@/types/api";
 import { ColumnDef, tableFeatures } from "@tanstack/react-table";
+import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import moment from "moment";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -36,23 +52,40 @@ import {
   Clock3,
   Dumbbell,
   KeyRound,
+  MoreHorizontalIcon,
   Mail,
   Pencil,
   ShieldCheck,
   UserRoundX,
+  XIcon,
 } from "lucide-react";
 
 type DetailTab = "detail" | "workout-history";
 
 type WorkoutHistory = {
-  id: number;
-  workoutName: string;
-  target: string;
-  bodyPart: string;
-  equipment: string;
-  category: string;
+  id: string;
+  name: string;
+  sessionCount: number;
+  duration: number;
   date: string;
+  exercises: AdminUserSessionExercise[];
 };
+
+function displayValue(value?: string | null) {
+  if (!value) return "-";
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function formatDuration(seconds?: number | null) {
+  if (!seconds || seconds <= 0) return "-";
+  const totalMinutes = Math.floor(seconds / 60);
+  const rest = seconds % 60;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  if (totalMinutes > 0) return `${totalMinutes}m ${rest}s`;
+  return `${rest}s`;
+}
 
 function initials(name: string) {
   return name
@@ -70,75 +103,59 @@ export default function UserDetailPage() {
   const { query: sessionsQuery } = useGetUserSessions(params.id);
   const user = userQuery.data?.data;
   const [activeTab, setActiveTab] = useState<DetailTab>("detail");
+  const [detailSession, setDetailSession] = useState<WorkoutHistory | null>(
+    null,
+  );
+  const [detailOpen, setDetailOpen] = useState(false);
+
+  function openDetail(session: WorkoutHistory) {
+    setDetailSession(session);
+    setDetailOpen(true);
+  }
 
   const workoutHistory = useMemo<WorkoutHistory[]>(() => {
     const sessions = sessionsQuery.data?.data ?? [];
+    const sessionCountByName = new Map<string, number>();
 
-    return sessions.flatMap((session) =>
-      (session.exercises ?? []).map((se) => ({
-        id: se.id,
-        workoutName: se.exercise?.name ?? session.name ?? "Workout",
-        target: se.exercise?.target ?? "-",
-        bodyPart: se.exercise?.body_part ?? "-",
-        equipment: se.exercise?.equipment ?? "-",
-        category: se.exercise?.category ?? "-",
+    sessions.forEach((session) => {
+      const name = session.name ?? "Workout";
+      sessionCountByName.set(name, (sessionCountByName.get(name) ?? 0) + 1);
+    });
+
+    return sessions.map((session) => {
+      const name = session.name ?? "Workout";
+
+      return {
+        id: session.id,
+        name,
+        sessionCount: sessionCountByName.get(name) ?? 1,
+        duration: session.duration ?? 0,
         date: session.created_at
           ? moment(session.created_at).format("DD MMM YYYY")
           : "-",
-      })),
-    );
+        exercises: session.exercises ?? [],
+      };
+    });
   }, [sessionsQuery.data?.data]);
 
   const features = tableFeatures({});
   const columns: Array<ColumnDef<typeof features, WorkoutHistory>> = [
     {
-      accessorKey: "workoutName",
-      header: "Workout",
+      accessorKey: "sessionCount",
+      header: "Sessions",
       cell: (info) => (
-        <div className="flex items-center gap-2.5">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-muted">
-            <Dumbbell className="size-4 text-muted-foreground" />
-          </span>
-          <strong className="font-medium">
-            {info.row.original.workoutName}
-          </strong>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "target",
-      header: "Target",
-      cell: (info) => (
-        <span className="text-muted-foreground">
-          {info.row.original.target}
+        <span className="font-medium tabular-nums">
+          {info.row.original.sessionCount} times
         </span>
       ),
     },
     {
-      accessorKey: "bodyPart",
-      header: "Body Part",
+      accessorKey: "duration",
+      header: "Duration",
       cell: (info) => (
-        <span className="text-muted-foreground">
-          {info.row.original.bodyPart}
+        <span className="text-muted-foreground tabular-nums">
+          {formatDuration(info.row.original.duration)}
         </span>
-      ),
-    },
-    {
-      accessorKey: "equipment",
-      header: "Equipment",
-      cell: (info) => (
-        <span className="text-muted-foreground">
-          {info.row.original.equipment}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "category",
-      header: "Category",
-      cell: (info) => (
-        <Badge variant="secondary" className="text-xs">
-          {info.row.original.category}
-        </Badge>
       ),
     },
     {
@@ -150,10 +167,36 @@ export default function UserDetailPage() {
         </span>
       ),
     },
+    {
+      accessorKey: "action",
+      header: "Action",
+      cell: (info) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button type="button" size="icon-xs" variant="ghost">
+                <MoreHorizontalIcon className="size-4" />
+              </Button>
+            }
+          />
+          <DropdownMenuContent className="w-auto">
+            <DropdownMenuItem
+              onClick={() => openDetail(info.row.original)}
+            >
+              Detail
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
   ];
 
   const stats = useMemo(() => {
-    const categories = new Set(workoutHistory.map((w) => w.category));
+    const categories = new Set(
+      (sessionsQuery.data?.data ?? []).flatMap((session) =>
+        (session.exercises ?? []).map((se) => se.exercise?.category ?? "-"),
+      ),
+    );
     return [
       {
         icon: Activity,
@@ -171,10 +214,10 @@ export default function UserDetailPage() {
         icon: Clock3,
         label: "Last activity",
         value: workoutHistory[0]?.date ?? "-",
-        hint: workoutHistory[0]?.workoutName ?? "No activity yet",
+        hint: workoutHistory[0]?.name ?? "No activity yet",
       },
     ];
-  }, [workoutHistory]);
+  }, [workoutHistory, sessionsQuery.data?.data]);
 
   if (userQuery.isLoading) {
     return (
@@ -461,6 +504,94 @@ export default function UserDetailPage() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {detailSession ? (
+          <DialogPrimitive.Root open={detailOpen} onOpenChange={setDetailOpen}>
+            <DialogPrimitive.Portal>
+              <DialogPrimitive.Backdrop
+                data-slot="workout-detail-backdrop"
+                className="fixed inset-0 z-50 bg-black/10 transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-xs"
+              />
+              <DialogPrimitive.Popup
+                data-slot="workout-detail-content"
+                className="fixed top-1/2 left-1/2 z-50 flex max-h-[85vh] w-[calc(100%-2rem)] max-w-3xl -translate-x-1/2 -translate-y-1/2 flex-col gap-3 overflow-hidden rounded-lg bg-popover bg-clip-padding p-4 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/10 outline-none transition duration-200 ease-in-out data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <DialogPrimitive.Title
+                      data-slot="workout-detail-title"
+                      className="font-heading font-medium text-foreground"
+                    >
+                      {detailSession.name}
+                    </DialogPrimitive.Title>
+                    <DialogPrimitive.Description
+                      data-slot="workout-detail-description"
+                      className="text-sm text-muted-foreground"
+                    >
+                      {detailSession.date} ·{" "}
+                      {formatDuration(detailSession.duration)} ·{" "}
+                      {detailSession.exercises.length} exercises
+                    </DialogPrimitive.Description>
+                  </div>
+                  <DialogPrimitive.Close
+                    render={
+                      <Button type="button" variant="ghost" size="icon-sm" />
+                    }
+                  >
+                    <XIcon />
+                    <span className="sr-only">Close</span>
+                  </DialogPrimitive.Close>
+                </div>
+
+                <div className="-mx-1 overflow-auto px-1">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Exercise</TableHead>
+                        <TableHead>Position</TableHead>
+                        <TableHead>Target</TableHead>
+                        <TableHead>Equipment</TableHead>
+                        <TableHead className="text-right">Duration</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {detailSession.exercises.length === 0 ? (
+                        <TableRow>
+                          <TableCell
+                            colSpan={5}
+                            className="text-center text-muted-foreground"
+                          >
+                            No exercises in this session.
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        detailSession.exercises.map((se) => (
+                          <TableRow key={se.id}>
+                            <TableCell className="font-medium">
+                              {displayValue(se.exercise?.name)}
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">
+                              {displayValue(se.exercise?.body_part)}
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">
+                              {displayValue(se.exercise?.target)}
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">
+                              {displayValue(se.exercise?.equipment)}
+                            </TableCell>
+                            <TableCell className="text-right tabular-nums text-muted-foreground">
+                              {formatDuration(se.duration)}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </DialogPrimitive.Popup>
+            </DialogPrimitive.Portal>
+          </DialogPrimitive.Root>
+        ) : null}
       </div>
     </AdminLayout>
   );
