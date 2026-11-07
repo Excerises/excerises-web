@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import AdminLayout from "@/components/admin/layout";
-import Paginator from "@/components/admin/paginator";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,194 +11,138 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldDescription, FieldError } from "@/components/ui/field";
+import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import DataTable from "@/components/ui/table/data-table";
-import { mockLoginLogs } from "@/mockups/login-logs";
-import { mockUsers } from "@/mockups/users";
-import { UserLoginLogs } from "@/types/model";
-import { ColumnDef, tableFeatures } from "@tanstack/react-table";
-import { cn } from "cn";
-
-type AccountTab = "profile" | "login-logs";
-
-const tabs: Array<{ id: AccountTab; label: string }> = [
-  { id: "profile", label: "Edit Akun" },
-  { id: "login-logs", label: "Login Logs" },
-];
+import {
+  useUpdateProfileAuth,
+  useUpdateProfileAuthForm,
+} from "@/hooks/api/profile/use-update-profile";
+import { FormControl } from "@/components/ui/form/form-control";
+import { useAuth } from "@/context/auth-context";
+import { InputPassword } from "@/components/ui/input-password";
+import { useEffect } from "react";
+import { toast } from "@/components/ui/toast";
+import { getError } from "@/lib/error";
 
 export default function AccountPage() {
-  const [activeTab, setActiveTab] = useState<AccountTab>("profile");
-  const [name, setName] = useState(mockUsers[0].name);
-  const [email, setEmail] = useState(mockUsers[0].email);
-  const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
-  const [notice, setNotice] = useState<string | null>(null);
+  const { user } = useAuth();
+  const { control, setError, handleSubmit, setValue } =
+    useUpdateProfileAuthForm();
 
-  const features = tableFeatures({});
-  const columns: Array<ColumnDef<typeof features, UserLoginLogs>> = [
-    {
-      accessorKey: "device",
-      header: "Perangkat",
-      cell: (info) => (
-        <div className="flex items-center gap-2">
-          <strong>{info.row.original.device}</strong>
-          {info.row.index === 0 && (
-            <Badge variant="default" className="text-xs">
-              SESI INI
-            </Badge>
-          )}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "ip_address",
-      header: "IP Address",
-      cell: (info) => (
-        <span className="text-muted-foreground">{String(info.getValue())}</span>
-      ),
-    },
-    {
-      accessorKey: "created_at",
-      header: "Waktu Login",
-      cell: (info) => (
-        <span className="text-muted-foreground">{String(info.getValue())}</span>
-      ),
-    },
-  ];
+  const { mutation } = useUpdateProfileAuth();
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setNotice(null);
-
-    const nextErrors: { name?: string; email?: string } = {};
-    if (!name.trim()) nextErrors.name = "Nama wajib diisi.";
-    if (!email.trim()) {
-      nextErrors.email = "Email wajib diisi.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      nextErrors.email = "Format email tidak valid.";
+  const onUpdateProfile = handleSubmit(async (v) => {
+    if (v.password != v.password_confirmation) {
+      setError("password_confirmation", {
+        message: "password confirmation mismatch",
+      });
+      return;
     }
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
 
-    setNotice("Perubahan akun berhasil disimpan.");
+    try {
+      await mutation.mutateAsync({
+        email: v.email,
+        name: v.name,
+        password: v.password,
+      });
+
+      toast.add({
+        type: "success",
+        title: "Account updated",
+        description: "Your account successfully updated",
+      });
+    } catch (err: unknown) {
+      toast.add({
+        type: "error",
+        title: "Failed update account",
+        description: getError(err),
+      });
+    }
+  });
+
+  function updateField() {
+    if (!user) {
+      return;
+    }
+
+    setValue("name", user.name);
+    setValue("email", user.email);
   }
+
+  useEffect(() => {
+    updateField();
+  }, [user]);
+  useEffect(() => {
+    updateField();
+  }, []);
 
   return (
     <AdminLayout breadcrumbs={[["Account"]]}>
-      <div className="flex gap-1 border-b">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id)}
-            className={cn(
-              "-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors",
-              activeTab === tab.id
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {activeTab === "profile" && (
+      <form onSubmit={onUpdateProfile}>
         <Card>
           <CardHeader>
-            <CardTitle>Edit Akun</CardTitle>
+            <CardTitle>Edit Account</CardTitle>
+            <CardDescription>Update your identity here.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <FormControl
+              control={control}
+              name="name"
+              required
+              label="Full Name"
+              render={({ field }) => (
+                <Input placeholder="Enter full name" {...field} />
+              )}
+            />
+            <FormControl
+              control={control}
+              name="email"
+              required
+              label="Email"
+              render={({ field }) => (
+                <Input placeholder="Enter email" type="email" {...field} />
+              )}
+            />
+            <Field>
+              <Label>Role</Label>
+              <div>
+                <Badge
+                  variant={user?.role === "admin" ? "default" : "secondary"}
+                  className="text-xs"
+                >
+                  {user?.role.toUpperCase()}
+                </Badge>
+              </div>
+            </Field>
+          </CardContent>
+          <CardHeader>
+            <CardTitle>Security Settings</CardTitle>
             <CardDescription>
-              Perbarui nama dan email akun Anda.
+              Leave password empty if you don{"'"}t want to change it.
             </CardDescription>
           </CardHeader>
-          <form onSubmit={handleSubmit}>
-            <CardContent>
-              <Field>
-                <Label htmlFor="account-name">Nama</Label>
-                <Input
-                  id="account-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Nama lengkap"
-                />
-                {errors.name && <FieldError>{errors.name}</FieldError>}
-              </Field>
-              <Field>
-                <Label htmlFor="account-email">Email</Label>
-                <Input
-                  id="account-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="nama@email.com"
-                />
-                {errors.email && <FieldError>{errors.email}</FieldError>}
-              </Field>
-              <Field>
-                <Label>Role</Label>
-                <div>
-                  <Badge
-                    variant={
-                      mockUsers[0].role === "admin" ? "default" : "secondary"
-                    }
-                    className="text-xs"
-                  >
-                    {mockUsers[0].role.toUpperCase()}
-                  </Badge>
-                </div>
-                <FieldDescription>
-                  Role akun tidak dapat diubah dari halaman ini.
-                </FieldDescription>
-              </Field>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium">Terakhir Login</span>
-                  <span className="text-sm text-muted-foreground">
-                    {mockUsers[0].last_login ?? "-"}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium">Terdaftar Sejak</span>
-                  <span className="text-sm text-muted-foreground">
-                    {mockUsers[0].created_at}
-                  </span>
-                </div>
-              </div>
-              {notice && (
-                <p className="text-sm text-muted-foreground">{notice}</p>
-              )}
-            </CardContent>
-          </form>
+          <CardContent>
+            <FormControl
+              control={control}
+              name="password"
+              label="New Password"
+              render={({ field }) => <InputPassword {...field} />}
+            />
+            <FormControl
+              control={control}
+              name="password_confirmation"
+              label="New Password Confirmation"
+              render={({ field }) => <InputPassword {...field} />}
+            />
+          </CardContent>
           <CardFooter className="pt-4">
             <Button type="submit" size="sm">
-              Simpan Perubahan
+              Save data
             </Button>
           </CardFooter>
         </Card>
-      )}
-
-      {activeTab === "login-logs" && (
-        <>
-          <Card>
-            <CardHeader>
-              <CardTitle>Login Logs</CardTitle>
-              <CardDescription>
-                Riwayat perangkat yang pernah masuk ke akun Anda.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DataTable
-                columns={columns}
-                data={mockLoginLogs}
-                features={features}
-                tableKey="account-login-logs-table"
-              />
-            </CardContent>
-          </Card>
-          <Paginator totalPage={1} />
-        </>
-      )}
+      </form>
     </AdminLayout>
   );
 }

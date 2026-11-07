@@ -25,7 +25,6 @@ export interface PaginatedResponse<T> {
   limit: number;
 }
 
-
 export interface DashboardStat {
   total_users: number;
   total_exercises: number;
@@ -71,4 +70,34 @@ export interface AdminUserSession {
   created_at?: string | null;
   updated_at?: string | null;
   exercises?: AdminUserSessionExercise[];
+}
+
+export interface CalculateFitnessRequest {
+  age: number;
+  gender: string;
+  height: number;
+  weight: number;
+  bmi?: number;
+  workout_freq_per_week: number;
+  workout_duration_per_day: number;
+  water_intake_daily: number;
+}
+
+export interface CalculateFitnessResponse {
+  level: string;
+}
+
+export interface UpdateProfileRequest extends Omit<
+  CalculateFitnessRequest,
+  "age"
+> {
+  birth_date: string;
+  reminder_days: number[];
+  reminder_time: string;
+}
+
+export interface UpdateProfileAuthRequest {
+  email?: string;
+  name?: string;
+  password?: string;
 }

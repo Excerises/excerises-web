@@ -4,16 +4,14 @@ import AuthLayout from "@/components/auth/layout";
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form/form-control";
 import { Input } from "@/components/ui/input";
+import { InputPassword } from "@/components/ui/input-password";
 import { useLogin, useLoginForm } from "@/hooks/api/auth/use-login";
 import { getError } from "@/lib/error";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 
 export default function LoginPage() {
   const { mutation } = useLogin();
   const { control, handleSubmit, setError } = useLoginForm();
-  const [showPassword, setShowPassword] = useState(false);
 
   const onLogin = handleSubmit(async (v) => {
     try {
@@ -44,27 +42,7 @@ export default function LoginPage() {
             name="password"
             label="Password"
             required
-            render={({ field }) => (
-              <div className="relative">
-                <Input
-                  placeholder="Password"
-                  className="pr-10"
-                  {...field}
-                  type={showPassword ? "text" : "password"}
-                />
-                <button
-                  type="button"
-                  className="absolute top-0 bottom-0 right-0 w-10 flex items-center justify-center outline-none"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeIcon className="size-4" />
-                  ) : (
-                    <EyeOffIcon className="size-4" />
-                  )}
-                </button>
-              </div>
-            )}
+            render={({ field }) => <InputPassword {...field} />}
           />
           <div className="flex justify-end">
             <Link href="/forgot-password" className="text-primary text-sm">
