@@ -27,6 +27,9 @@ import { useRouter } from "next/navigation";
 import { useGetExercises } from "@/hooks/api/exercise/use-exercise-query";
 import { capitalize } from "@/lib/format";
 import { Spinner } from "@/components/ui/spinner";
+import { ImportExerciseDialog } from "@/components/admin/exercise/import-exercise-dialog";
+import { useImportExercise } from "@/hooks/api/exercise/use-exercise-mutation";
+import { toast } from "@/components/ui/toast";
 
 function difficultyVariant(difficulty: string) {
   switch (difficulty.toLowerCase()) {
@@ -54,8 +57,8 @@ export default function ExercisesPage() {
     debouncedSearch,
     pagination,
   } = useGetExercises();
-  const [importNotice, setImportNotice] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { mutation: importMutation } = useImportExercise();
+  const [showImportDialog, setShowImportDialog] = useState(false);
   const features = tableFeatures({
     rowPaginationFeature: rowPaginationFeature,
     paginatedRowModel: createPaginatedRowModel(),
@@ -155,14 +158,6 @@ export default function ExercisesPage() {
     [],
   );
 
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-
-    setImportNotice(null);
-  }
-
   async function handleDownloadTemplate() {
     const XLSX = await import("xlsx");
     const worksheet = XLSX.utils.json_to_sheet(
@@ -184,6 +179,19 @@ export default function ExercisesPage() {
     XLSX.writeFile(workbook, "template-exercises.xlsx");
   }
 
+  async function handleImportExercise(file?: File) {
+    if (file) {
+      const res = await importMutation.mutateAsync({ file });
+      toast.add({
+        type: "info",
+        title: res.data.success ? "Success" : "Failed",
+        description: res.data.message,
+      });
+
+      setShowImportDialog(false);
+    }
+  }
+
   return (
     <AdminLayout breadcrumbs={[["Master Data"], ["Exercise"]]}>
       <TopFilter
@@ -201,27 +209,21 @@ export default function ExercisesPage() {
               <DownloadIcon className="size-4" />
               Template
             </Button>
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <UploadIcon className="size-4" />
-              Import Excel
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".xlsx,.xls,.csv"
-              className="hidden"
-              onChange={handleFileChange}
+            <ImportExerciseDialog
+              open={showImportDialog}
+              onOpenChange={setShowImportDialog}
+              loading={importMutation.isPending}
+              trigger={
+                <Button type="button" size="sm">
+                  <UploadIcon className="size-4" />
+                  Import Excel
+                </Button>
+              }
+              onImport={handleImportExercise}
             />
           </>
         }
       />
-      {importNotice && (
-        <p className="text-sm text-muted-foreground">{importNotice}</p>
-      )}
       <Card>
         <CardContent>
           {exercisesQuery.isLoading ? (

@@ -101,3 +101,14 @@ export interface UpdateProfileAuthRequest {
   name?: string;
   password?: string;
 }
+
+export interface ExerciseImportRequest {
+  file: File;
+}
+
+export interface ExerciseImportResult {
+  success: boolean;
+  message: string;
+  imported_count: number;
+  skipped_count: number;
+}
