@@ -1,9 +1,16 @@
-import { Activity, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
+import {
+  Activity,
+  ArrowRight,
+  ShieldCheck,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { APP_NAME } from "@/constant/app";
-import StoreButtons from "./store-buttons";
 
 const stats = [
   { value: "94%", label: "Prediction accuracy" },
@@ -33,8 +40,11 @@ export default function Hero() {
             generate personalized training recommendations — so every workout
             moves you forward, safely and efficiently.
           </p>
-          <div className="mt-8">
-            <StoreButtons />
+          <div className="mt-5">
+            <Button size="lg" render={<Link href="/start" />}>
+              Get Started Now
+              <ArrowRight className="size-4" />
+            </Button>
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5">
@@ -54,20 +64,20 @@ export default function Hero() {
             className="pointer-events-none absolute -right-20 size-[28rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklch,var(--primary)_25%,transparent),transparent_70%)] blur-2xl"
           />
           <div
-  aria-hidden
-  className="pointer-events-none absolute -right-24 size-[36rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklch,var(--primary)_25%,transparent),transparent_70%)] blur-2xl"
- />
+            aria-hidden
+            className="pointer-events-none absolute -right-24 size-[36rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklch,var(--primary)_25%,transparent),transparent_70%)] blur-2xl"
+          />
 
-<div className="relative w-full min-w-0 rounded-3xl bg-[radial-gradient(circle_at_50%_50%,color-mix(in_oklch,var(--primary)_12%,transparent),transparent_70%)] p-2 lg:-mr-12 xl:-mr-20">
-  <Image
-    src="/hero-illustration.png"
-    alt={`${APP_NAME} fitness illustration`}
-    width={1000}
-    height={667}
-    priority
-    className="h-auto w-full max-w-none scale-110 object-contain"
-  />
-</div>
+          <div className="relative w-full min-w-0 rounded-3xl bg-[radial-gradient(circle_at_50%_50%,color-mix(in_oklch,var(--primary)_12%,transparent),transparent_70%)] p-2 lg:-mr-12 xl:-mr-20">
+            <Image
+              src="/hero-illustration.png"
+              alt={`${APP_NAME} fitness illustration`}
+              width={1000}
+              height={667}
+              priority
+              className="h-auto w-full max-w-none scale-110 object-contain"
+            />
+          </div>
         </div>
       </div>
 
