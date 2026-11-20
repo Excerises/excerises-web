@@ -41,7 +41,11 @@ export default function Hero() {
             moves you forward, safely and efficiently.
           </p>
           <div className="mt-5">
-            <Button size="lg" render={<Link href="/start" />}>
+            <Button
+              size="lg"
+              className="font-semibold px-5 py-3 uppercase"
+              render={<Link href="/start" />}
+            >
               Get Started Now
               <ArrowRight className="size-4" />
             </Button>
