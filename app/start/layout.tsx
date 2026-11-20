@@ -1,10 +1,12 @@
 "use client";
 
 import { StartProvider } from "@/context/start-context";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, Check, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
+import { Badge } from "@/components/ui/badge";
+import { APP_NAME } from "@/constant/app";
 
 const steps = [
   { label: "Calculate Fitness", path: "/start/calculate-fitness" },
@@ -58,8 +60,13 @@ export default function StartLayout({ children }: { children: ReactNode }) {
   return (
     <StartProvider>
       <div className="min-h-screen bg-background">
-        <header className="border-b">
-          <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(60%_50%_at_50%_0%,color-mix(in_oklch,var(--primary)_18%,transparent),transparent)]"
+        />
+
+        <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-md">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
             <Link
               href="/"
               className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
@@ -70,7 +77,24 @@ export default function StartLayout({ children }: { children: ReactNode }) {
             <StepIndicator />
           </div>
         </header>
-        <main className="mx-auto max-w-2xl px-4 py-8">{children}</main>
+
+        <main className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6">
+          <div className="mx-auto max-w-2xl text-center">
+            <Badge className="gap-1.5 rounded-full px-3 py-1.5">
+              <Sparkles className="size-3.5" />
+              Workout Plan Preview
+            </Badge>
+            <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
+              Build your training plan in minutes
+            </h1>
+            <p className="mt-3 text-muted-foreground">
+              Answer a few questions — {APP_NAME} will predict your fitness level and
+              recommend exercises tailored to your goals.
+            </p>
+          </div>
+
+          <div className="mx-auto mt-10 max-w-2xl">{children}</div>
+        </main>
       </div>
     </StartProvider>
   );

@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { useRecommendExercises } from "@/hooks/api/exercise/use-exercise-mutation";
 import { useStartContext } from "@/context/start-context";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -16,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FormControl } from "@/components/ui/form/form-control";
 import {
   Card,
   CardContent,
@@ -24,6 +23,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type {
   ExerciseBodyPart,
   ExerciseCategory,
@@ -105,15 +107,30 @@ function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+const schema = z.object({
+  target: z.string().min(1, "Target muscle required"),
+  bodyPart: z.string().min(1, "Body part required"),
+  equipment: z.string().min(1, "Equipment required"),
+  category: z.string().min(1, "Category required"),
+});
+
+type FormValues = z.infer<typeof schema>;
+
 export default function RecommendExercisesPage() {
   const router = useRouter();
   const { fitnessLevel, setExercises } = useStartContext();
   const { mutation } = useRecommendExercises();
 
-  const [bodyPart, setBodyPart] = useState("");
-  const [equipment, setEquipment] = useState("");
-  const [target, setTarget] = useState("");
-  const [category, setCategory] = useState("");
+  const form = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      target: "",
+      bodyPart: "",
+      equipment: "",
+      category: "",
+    },
+    mode: "onTouched",
+  });
 
   useEffect(() => {
     if (!fitnessLevel) {
@@ -123,15 +140,14 @@ export default function RecommendExercisesPage() {
 
   if (!fitnessLevel) return null;
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  function onSubmit(values: FormValues) {
     mutation.mutate(
       {
-        body_part: bodyPart as ExerciseBodyPart,
-        equipment: equipment as ExerciseEquipment,
-        target: target as ExerciseTarget,
+        body_part: values.bodyPart as ExerciseBodyPart,
+        equipment: values.equipment as ExerciseEquipment,
+        target: values.target as ExerciseTarget,
         difficulty: fitnessLevel as ExerciseDifficulty,
-        category: category as ExerciseCategory,
+        category: values.category as ExerciseCategory,
         top_n: 10,
       },
       {
@@ -152,7 +168,7 @@ export default function RecommendExercisesPage() {
         <Badge>{capitalize(fitnessLevel)}</Badge>
       </div>
 
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Get Exercise Recommendations</CardTitle>
           <CardDescription>
@@ -161,87 +177,103 @@ export default function RecommendExercisesPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label>Target Muscle</Label>
-              <Select
-                value={target}
-                onValueChange={(v) => setTarget(v ?? "")}
-                required
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select target" />
-                </SelectTrigger>
-                <SelectContent>
-                  {targets.map((v) => (
-                    <SelectItem key={v} value={v}>
-                      {capitalize(v)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormControl
+              control={form.control}
+              name="target"
+              label="Target Muscle"
+              required
+              render={({ field, fieldState }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(v) => field.onChange(v ?? "")}
+                >
+                  <SelectTrigger className="w-full" aria-invalid={fieldState.invalid}>
+                    <SelectValue placeholder="Select target" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {targets.map((v) => (
+                      <SelectItem key={v} value={v}>
+                        {capitalize(v)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Body Part</Label>
-                <Select
-                  value={bodyPart}
-                  onValueChange={(v) => setBodyPart(v ?? "")}
-                  required
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select body part" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {bodyParts.map((v) => (
-                      <SelectItem key={v} value={v}>
-                        {capitalize(v)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Equipment</Label>
-                <Select
-                  value={equipment}
-                  onValueChange={(v) => setEquipment(v ?? "")}
-                  required
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select equipment" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {equipments.map((v) => (
-                      <SelectItem key={v} value={v}>
-                        {capitalize(v)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <FormControl
+                control={form.control}
+                name="bodyPart"
+                label="Body Part"
+                required
+                render={({ field, fieldState }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={(v) => field.onChange(v ?? "")}
+                  >
+                    <SelectTrigger className="w-full" aria-invalid={fieldState.invalid}>
+                      <SelectValue placeholder="Select body part" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {bodyParts.map((v) => (
+                        <SelectItem key={v} value={v}>
+                          {capitalize(v)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <FormControl
+                control={form.control}
+                name="equipment"
+                label="Equipment"
+                required
+                render={({ field, fieldState }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={(v) => field.onChange(v ?? "")}
+                  >
+                    <SelectTrigger className="w-full" aria-invalid={fieldState.invalid}>
+                      <SelectValue placeholder="Select equipment" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {equipments.map((v) => (
+                        <SelectItem key={v} value={v}>
+                          {capitalize(v)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
 
-            <div className="space-y-2">
-              <Label>Category</Label>
-              <Select
-                value={category}
-                onValueChange={(v) => setCategory(v ?? "")}
-                required
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((v) => (
-                    <SelectItem key={v} value={v}>
-                      {capitalize(v)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <FormControl
+              control={form.control}
+              name="category"
+              label="Category"
+              required
+              render={({ field, fieldState }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(v) => field.onChange(v ?? "")}
+                >
+                  <SelectTrigger className="w-full" aria-invalid={fieldState.invalid}>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((v) => (
+                      <SelectItem key={v} value={v}>
+                        {capitalize(v)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
 
             <div className="flex justify-end pt-2">
               <Button

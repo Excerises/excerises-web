@@ -6,7 +6,7 @@ import { Dumbbell, Download } from "lucide-react";
 import { useStartContext } from "@/context/start-context";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -47,8 +47,8 @@ export default function FinishPage() {
       </div>
 
       <div className="space-y-4">
-        {exercises.map((exercise, i) => (
-          <Card key={exercise.id}>
+        {exercises.map((exercise) => (
+          <Card key={exercise.id} className="shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <Dumbbell className="size-4 text-primary" />
@@ -69,15 +69,17 @@ export default function FinishPage() {
         ))}
       </div>
 
-      <div className="sticky bottom-0 border-t bg-background py-4">
-        <Button
-          className="w-full"
-          size="lg"
-          onClick={() => setShowDialog(true)}
-        >
-          <Dumbbell className="size-4" />
-          Start Session
-        </Button>
+      <div className="sticky bottom-0 -mx-4 border-t bg-background/90 py-4 backdrop-blur-md sm:-mx-6">
+        <div className="mx-auto max-w-2xl px-4 sm:px-6">
+          <Button
+            className="w-full"
+            size="lg"
+            onClick={() => setShowDialog(true)}
+          >
+            <Dumbbell className="size-4" />
+            Start Session
+          </Button>
+        </div>
       </div>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
