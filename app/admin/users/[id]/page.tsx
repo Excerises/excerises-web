@@ -58,7 +58,9 @@ import {
   ShieldCheck,
   UserRoundX,
   XIcon,
+  Bell,
 } from "lucide-react";
+import { SendNotificationDialog } from "@/components/admin/users/send-notification-dialog";
 
 type DetailTab = "detail" | "workout-history";
 
@@ -107,6 +109,7 @@ export default function UserDetailPage() {
     null,
   );
   const [detailOpen, setDetailOpen] = useState(false);
+  const [notifyOpen, setNotifyOpen] = useState(false);
 
   function openDetail(session: WorkoutHistory) {
     setDetailSession(session);
@@ -268,6 +271,14 @@ export default function UserDetailPage() {
             Back
           </Button>
           <div className="ml-auto flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setNotifyOpen(true)}
+            >
+              <Bell className="size-4" />
+              Send notification
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -592,6 +603,12 @@ export default function UserDetailPage() {
             </DialogPrimitive.Portal>
           </DialogPrimitive.Root>
         ) : null}
+        <SendNotificationDialog
+          userId={user.id}
+          userName={user.name}
+          open={notifyOpen}
+          onOpenChange={setNotifyOpen}
+        />
       </div>
     </AdminLayout>
   );

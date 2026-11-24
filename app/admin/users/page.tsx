@@ -28,6 +28,7 @@ import { useDeleteUser, useGetUsers } from "@/hooks/api/user/use-user-query";
 import { getApiErrorMessage } from "@/network/api";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
+import { SendNotificationDialog } from "@/components/admin/users/send-notification-dialog";
 
 export default function UsersPage() {
   const {
@@ -39,6 +40,7 @@ export default function UsersPage() {
   } = useGetUsers();
   const router = useRouter();
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [userToNotify, setUserToNotify] = useState<User | null>(null);
   const deleteUser = useDeleteUser();
 
   const filteredUsers = useMemo(() => {
@@ -156,6 +158,9 @@ export default function UsersPage() {
                 >
                   Change Password
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setUserToNotify(user)}>
+                  Send Notification
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   variant="destructive"
                   onClick={() => handleDelete(user)}
@@ -219,6 +224,14 @@ export default function UsersPage() {
         confirmVariant="destructive"
         onConfirm={handleConfirmDelete}
       />
+      {userToNotify && (
+        <SendNotificationDialog
+          open={userToNotify !== null}
+          onOpenChange={(open) => !open && setUserToNotify(null)}
+          userId={userToNotify.id}
+          userName={userToNotify.name}
+        />
+      )}
     </AdminLayout>
   );
 }
